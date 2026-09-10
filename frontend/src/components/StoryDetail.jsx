@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 
 import { storyService } from "../services/storyService";
+import { MagicalLoader } from "./common/LoadingComponents";
 
 // ======================================================
 // BACKEND URL
@@ -412,25 +413,11 @@ const StoryDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div
-            className="
-              w-14
-              h-14
-              border-4
-              border-white/20
-              border-t-yellow-400
-              rounded-full
-              animate-spin
-              mx-auto
-            "
-          />
-
-          <p className="text-white mt-4 text-lg font-semibold">
-            Loading story...
-          </p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 flex items-center justify-center">
+        <MagicalLoader
+          message="Loading magical story..."
+          subtext="Unfolding the adventure... ✨"
+        />
       </div>
     );
   }

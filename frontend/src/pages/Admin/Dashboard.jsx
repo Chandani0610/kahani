@@ -22,13 +22,7 @@ import { storyService } from '../../services/storyService';
 import { videoService } from '../../services/videoService';
 import { contactService } from '../../services/contactService';
 import { newsletterService } from '../../services/newsletterService';
-
-// Mock user service – replace with your actual user service
-const userService = {
-  getAll: async () => {
-    return [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
-  },
-};
+import { userService } from '../../services/userService';
 
 // Dashboard Header Component with Date Picker
 const DashboardHeader = ({ stats, subscribersToday }) => {
@@ -597,11 +591,39 @@ const Dashboard = () => {
       ]);
 
       // Ensure all data is arrays
-      const storiesArray = Array.isArray(stories) ? stories : [];
-      const videosArray = Array.isArray(videos) ? videos : [];
-      const contactsArray = Array.isArray(contacts) ? contacts : [];
-      const subscribersArray = Array.isArray(subscribers) ? subscribers : [];
-      const usersArray = Array.isArray(users) ? users : [];
+      const storiesArray = Array.isArray(stories)
+        ? stories
+        : Array.isArray(stories?.data)
+        ? stories.data
+        : Array.isArray(stories?.stories)
+        ? stories.stories
+        : [];
+      const videosArray = Array.isArray(videos)
+        ? videos
+        : Array.isArray(videos?.data)
+        ? videos.data
+        : Array.isArray(videos?.videos)
+        ? videos.videos
+        : [];
+      const contactsArray = Array.isArray(contacts)
+        ? contacts
+        : Array.isArray(contacts?.data)
+        ? contacts.data
+        : [];
+      const subscribersArray = Array.isArray(subscribers)
+        ? subscribers
+        : Array.isArray(subscribers?.data)
+        ? subscribers.data
+        : Array.isArray(subscribers?.newsletters)
+        ? subscribers.newsletters
+        : [];
+      const usersArray = Array.isArray(users)
+        ? users
+        : Array.isArray(users?.users)
+        ? users.users
+        : Array.isArray(users?.data)
+        ? users.data
+        : [];
 
       console.log('Stories count:', storiesArray.length);
       console.log('Videos count:', videosArray.length);
@@ -853,8 +875,16 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+          <p className="text-gray-500 mt-1">Overview of stories, videos, and platform analytics</p>
+        </div>
+        <div className="bg-white rounded-xl p-16 text-center shadow-sm border border-gray-100">
+          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-gray-800">Loading Dashboard</h3>
+          <p className="text-gray-500 text-sm mt-1">Retrieving latest stories, analytics, and activity...</p>
+        </div>
       </div>
     );
   }

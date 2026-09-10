@@ -175,8 +175,18 @@ const AdminContacts = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">Contact Messages</h1>
+            <p className="text-gray-500 mt-1">Manage inquiries and messages from visitors</p>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-100">
+          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-700 font-semibold">Loading messages...</p>
+          <p className="text-gray-400 text-sm mt-1">Please wait while visitor inquiries are retrieved</p>
+        </div>
       </div>
     );
   }

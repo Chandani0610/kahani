@@ -3,25 +3,11 @@ import { videoService } from "../services/videoService";
 import Navbar from "../components/Navbar";
 import VideoSection from "../components/VideoSection";
 import Footer from "../components/Footer";
-import Contact from "../components/Contact";
 
 const Videos = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isContactOpen, setIsContactOpen] = useState(false);
-
-  useEffect(() => {
-    const handleOpenContact = () => {
-      setIsContactOpen(true);
-    };
-
-    window.addEventListener("openContact", handleOpenContact);
-
-    return () => {
-      window.removeEventListener("openContact", handleOpenContact);
-    };
-  }, []);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -40,21 +26,6 @@ const Videos = () => {
 
     fetchVideos();
   }, []);
-
-  if (loading) {
-    return (
-      <>
-        <Navbar />
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 to-indigo-900">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="text-white font-bold mt-4 text-xl">Loading magical videos... 🎬</p>
-          </div>
-        </div>
-        <Footer />
-      </>
-    );
-  }
 
   if (error) {
     return (
@@ -81,12 +52,8 @@ const Videos = () => {
     <>
       <Navbar />
       <div className="pt-0">
-        <VideoSection videos={videos} />
+        <VideoSection videos={videos} loading={loading} />
       </div>
-      <Contact
-        isOpen={isContactOpen}
-        onClose={() => setIsContactOpen(false)}
-      />
       <Footer />
     </>
   );

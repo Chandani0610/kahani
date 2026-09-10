@@ -7,29 +7,11 @@ import Navbar from "../components/Navbar";
 import JungleFriends from "../components/JungleFriends";
 import VideoSection from "../components/VideoSection";
 import StoryCards from "../components/StoryCards";
-import Newsletter from "../components/Newsletter";
-import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 
 function Home() {
-  const [isContactOpen, setIsContactOpen] = useState(false);
-
   const [videos, setVideos] = useState([]);
-
-  // ==========================================
-  // CONTACT EVENT
-  // ==========================================
-  useEffect(() => {
-    const handleOpenContact = () => {
-      setIsContactOpen(true);
-    };
-
-    window.addEventListener("openContact", handleOpenContact);
-
-    return () => {
-      window.removeEventListener("openContact", handleOpenContact);
-    };
-  }, []);
+  const [videosLoading, setVideosLoading] = useState(true);
 
   // ==========================================
   // FETCH VIDEOS
@@ -39,6 +21,7 @@ function Home() {
 
     const loadVideos = async () => {
       try {
+        setVideosLoading(true);
         const data = await videoService.getAll();
 
         if (!mounted) return;
@@ -49,6 +32,10 @@ function Home() {
 
         if (mounted) {
           setVideos([]);
+        }
+      } finally {
+        if (mounted) {
+          setVideosLoading(false);
         }
       }
     };
@@ -96,7 +83,7 @@ function Home() {
             VIDEOS
         ======================================== */}
         <section id="videos">
-          <VideoSection videos={videos} />
+          <VideoSection videos={videos} loading={videosLoading} />
         </section>
 
         {/* ========================================
@@ -106,21 +93,6 @@ function Home() {
         <section id="stories">
           <StoryCards />
         </section>
-
-        {/* ========================================
-            NEWSLETTER
-        ======================================== */}
-        <section id="newsletter">
-          <Newsletter />
-        </section>
-
-        {/* ========================================
-            CONTACT
-        ======================================== */}
-        <Contact
-          isOpen={isContactOpen}
-          onClose={() => setIsContactOpen(false)}
-        />
 
         {/* ========================================
             FOOTER

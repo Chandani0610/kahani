@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // Layouts
 import MainLayout from "../layouts/MainLayout";
@@ -58,6 +58,8 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/Admin-login" element={<AdminLogin />} />
+      <Route path="/admin-login" element={<AdminLogin />} />
+      <Route path="/admin" element={<Navigate to="/Admin" replace />} />
 
       {/* Protected Admin Routes */}
       <Route

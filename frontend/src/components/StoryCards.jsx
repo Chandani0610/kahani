@@ -18,6 +18,7 @@ import StoryModal from "./StoryModal";
 import { storyService } from "../services/storyService";
 
 import Navbar from "./Navbar";
+import { StoryCardSkeleton } from "./common/LoadingComponents";
 
 // ======================================================
 // BACKEND IMAGE URL
@@ -146,27 +147,10 @@ const StoryCard = ({ story, index, handleOpen }) => {
               duration-200
             "
 
-            loading="eager"
-            decoding="sync"
-            fetchPriority="high"
-
-            onLoad={() => {
-              console.log(
-                `✅ Story image loaded: ${story.title}`,
-                imageUrl
-              );
-            }}
-
-            onError={(e) => {
-              console.error(
-                `❌ Story image failed: ${story.title}`,
-                {
-                  id: story.id,
-                  imageUrl,
-                  src: e.currentTarget.src,
-                }
-              );
-
+            loading={index < 4 ? "eager" : "lazy"}
+            decoding="async"
+            fetchPriority={index < 2 ? "high" : "auto"}
+            onError={() => {
               setImageError(true);
             }}
           />
@@ -353,12 +337,27 @@ const EmptyState = () => (
 // STORY CARDS
 // ======================================================
 
-const StoryCards = ({ showOnlyGrid = false }) => {
+const StoryCards = ({
+  showOnlyGrid = false,
+  stories: propStories,
+  loading: propLoading,
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(
+    propLoading !== undefined ? propLoading : propStories === undefined
+  );
   const [error, setError] = useState(null);
+
+  const rawStories = propStories !== undefined ? propStories : stories;
+  const isLoading =
+    propLoading !== undefined
+      ? propLoading
+      : propStories !== undefined
+      ? false
+      : loading;
 
   const [open, setOpen] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
@@ -392,7 +391,12 @@ const StoryCards = ({ showOnlyGrid = false }) => {
   // ====================================================
 
   const fetchStories = useCallback(async () => {
+    if (propStories !== undefined) {
+      return;
+    }
+
     try {
+      setLoading(true);
       setError(null);
 
       let response;
@@ -425,24 +429,6 @@ const StoryCards = ({ showOnlyGrid = false }) => {
         `📚 StoryCards received ${storiesData.length} stories`
       );
 
-      // ==================================================
-      // DEBUG IMAGE DATA
-      // ==================================================
-
-      storiesData.forEach((story) => {
-        console.log(
-          "🖼️ StoryCard image data:",
-          {
-            id: story.id,
-            title: story.title,
-            has_image: story.has_image,
-            image_url: story.image_url,
-            finalImageUrl:
-              getBackendImageUrl(story),
-          }
-        );
-      });
-
       setStories(storiesData);
     } catch (err) {
       console.error(
@@ -456,20 +442,24 @@ const StoryCards = ({ showOnlyGrid = false }) => {
       );
 
       setStories([]);
+    } finally {
+      setLoading(false);
     }
-  }, [showOnlyGrid]);
+  }, [showOnlyGrid, propStories]);
 
   // ====================================================
   // LOAD
   // ====================================================
 
   useEffect(() => {
+    if (propStories !== undefined) return;
+
     const loadStories = setTimeout(() => {
       fetchStories();
     }, 0);
 
     return () => clearTimeout(loadStories);
-  }, [fetchStories]);
+  }, [fetchStories, propStories]);
 
   // ====================================================
   // URL CATEGORY SYNC
@@ -538,16 +528,16 @@ const StoryCards = ({ showOnlyGrid = false }) => {
       !selectedCategory ||
       selectedCategory === "All"
     ) {
-      return stories;
+      return rawStories;
     }
 
-    return stories.filter(
+    return rawStories.filter(
       (story) =>
         story.category ===
         selectedCategory
     );
   }, [
-    stories,
+    rawStories,
     selectedCategory,
     showOnlyGrid,
   ]);
@@ -837,7 +827,13 @@ const StoryCards = ({ showOnlyGrid = false }) => {
 
             {renderCategoryFilter()}
 
-            {filteredStories.length === 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {Array.from({ length: 8 }).map((_, idx) => (
+                  <StoryCardSkeleton key={`all-stories-skel-${idx}`} />
+                ))}
+              </div>
+            ) : filteredStories.length === 0 ? (
               <EmptyState />
             ) : (
               <div
@@ -930,7 +926,7 @@ const StoryCards = ({ showOnlyGrid = false }) => {
   // ====================================================
 
   const homeStories =
-    stories.slice(0, 4);
+    rawStories.slice(0, 4);
 
   return (
     <>
@@ -1003,7 +999,13 @@ const StoryCards = ({ showOnlyGrid = false }) => {
             </p>
           </div>
 
-          {homeStories.length === 0 ? (
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <StoryCardSkeleton key={`home-stories-skel-${idx}`} />
+              ))}
+            </div>
+          ) : homeStories.length === 0 ? (
             <EmptyState />
           ) : (
             <div

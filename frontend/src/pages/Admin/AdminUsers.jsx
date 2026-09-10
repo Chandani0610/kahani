@@ -69,7 +69,9 @@ const AdminUsers = () => {
     try {
       setLoading(true);
       const response = await api.get('/users');
-      const usersData = response.data.users || [];
+      const usersData = Array.isArray(response.data)
+        ? response.data
+        : (response.data?.users || response.data?.data || []);
       
       // Store all users for statistics
       setAllUsers(usersData);
@@ -78,8 +80,8 @@ const AdminUsers = () => {
       const total = usersData.length;
       const active = usersData.filter(u => u.status === 'active').length;
       const inactive = usersData.filter(u => u.status === 'inactive').length;
-      const pending = usersData.filter(u => u.status === 'pending').length;
-      const admins = usersData.filter(u => u.role === 'admin').length;
+      const pending = usersData.filter(u => u.status === 'pending' || !u.email_verified).length;
+      const admins = usersData.filter(u => u.role === 'admin' || u.role === 'superadmin').length;
       const regularUsers = usersData.filter(u => u.role === 'user').length;
       
       // Login statistics - from ALL users
@@ -275,8 +277,18 @@ const AdminUsers = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">User Management</h1>
+            <p className="text-gray-500 mt-1">View and manage all users in the system</p>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-100">
+          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-700 font-semibold">Loading users list...</p>
+          <p className="text-gray-400 text-sm mt-1">Please wait while user records are being retrieved</p>
+        </div>
       </div>
     );
   }
@@ -329,7 +341,9 @@ const AdminUsers = () => {
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-green-500 font-medium">{Math.round((stats.active/stats.total)*100)}%</span>
+            <span className="text-green-500 font-medium">
+              {stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}%
+            </span>
             <span className="text-gray-400 ml-1">of total users</span>
           </div>
         </div>
@@ -362,7 +376,9 @@ const AdminUsers = () => {
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-500 font-medium">{Math.round((stats.neverLoggedIn/stats.total)*100)}%</span>
+            <span className="text-gray-500 font-medium">
+              {stats.total > 0 ? Math.round((stats.neverLoggedIn / stats.total) * 100) : 0}%
+            </span>
             <span className="text-gray-400 ml-1">of total users</span>
           </div>
         </div>

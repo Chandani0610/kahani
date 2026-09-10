@@ -56,25 +56,25 @@ const {
     isAdmin,
 } = require("../middleware/auth");
 
-// Super Admin Routes
+// Admin & Super Admin Routes
 router.get(
     "/",
     isAuthenticated,
-    isSuperAdmin,
+    isAdmin,
     getAllUsers
 );
 
 router.get(
     "/stats",
     isAuthenticated,
-    isSuperAdmin,
+    isAdmin,
     getUserStats
 );
 
 router.get(
     "/admins",
     isAuthenticated,
-    isSuperAdmin,
+    isAdmin,
     getAllAdmins
 );
 

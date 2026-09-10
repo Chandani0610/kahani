@@ -3,6 +3,8 @@ const router = express.Router();
 const newsletterController = require("../controllers/newsletterController");
 
 // ============= GET Routes =============
+router.get("/subscribers", newsletterController.getSubscribers);
+router.get("/subscribers/stats", newsletterController.getStats);
 router.get("/", newsletterController.getSubscribers);
 router.get("/active", newsletterController.getActiveSubscribers);
 router.get("/pending", newsletterController.getPending);

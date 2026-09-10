@@ -19,9 +19,11 @@ import { videoService } from "../services/videoService";
 import VideoCard from "./VideoCard";
 import VideoModal from "./VideoModal";
 import Navbar from "./Navbar";
+import { VideoGridSkeleton } from "./common/LoadingComponents";
 
 const VideoSection = ({
   videos: propVideos,
+  loading: propLoading,
   showOnlyGrid = false,
 }) => {
   const navigate = useNavigate();
@@ -74,6 +76,13 @@ const VideoSection = ({
     propVideos !== undefined
       ? propVideos
       : fetchedVideos;
+
+  const isLoading =
+    propLoading !== undefined
+      ? propLoading
+      : propVideos !== undefined
+      ? false
+      : !hasLoaded;
 
   // ==========================================
   // FETCH VIDEOS
@@ -533,10 +542,10 @@ const VideoSection = ({
                 VIDEO GRID
             ===================================== */}
 
-            {!hasLoaded ? null : filteredVideos.length === 0 ? (
-
+            {isLoading ? (
+              <VideoGridSkeleton count={8} />
+            ) : filteredVideos.length === 0 ? (
               <div className="text-center py-16 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-lg">
-
                 <p className="text-4xl mb-4">
                   🎬
                 </p>
@@ -548,9 +557,7 @@ const VideoSection = ({
                 <p className="text-gray-300 mt-2">
                   Try selecting a different category
                 </p>
-
               </div>
-
             ) : (
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -736,6 +743,14 @@ const VideoSection = ({
       <div className="absolute inset-0 w-full h-full z-10">
 
         <div className="relative w-full h-full">
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="bg-white/90 backdrop-blur-md px-6 py-3.5 rounded-full shadow-xl border border-white/40 flex items-center gap-3 animate-pulse">
+                <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                <span className="text-gray-800 font-bold text-sm">Launching magical videos... 🎈</span>
+              </div>
+            </div>
+          )}
 
           {validVideos
             .slice(0, 5)

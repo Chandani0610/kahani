@@ -3,20 +3,20 @@ const db = require("../config/db");
 const Contact = {
     // Get all contacts
     getAll: (callback) => {
-        const query = "SELECT * FROM contacts ORDER BY created_at DESC";
+        const query = "SELECT *, (status = 'read' OR status = 'resolved') AS replied FROM contacts ORDER BY created_at DESC";
         db.query(query, callback);
     },
 
     // Get single contact by ID
     getById: (id, callback) => {
-        const query = "SELECT * FROM contacts WHERE id = ?";
+        const query = "SELECT *, (status = 'read' OR status = 'resolved') AS replied FROM contacts WHERE id = ?";
         db.query(query, [id], callback);
     },
 
     // Get multiple contacts by IDs
     getByIds: (ids, callback) => {
         const placeholders = ids.map(() => '?').join(',');
-        const query = `SELECT * FROM contacts WHERE id IN (${placeholders})`;
+        const query = `SELECT *, (status = 'read' OR status = 'resolved') AS replied FROM contacts WHERE id IN (${placeholders})`;
         db.query(query, ids, callback);
     },
 
@@ -56,31 +56,31 @@ const Contact = {
 
     // Get contacts by status
     getByStatus: (status, callback) => {
-        const query = "SELECT * FROM contacts WHERE status = ? ORDER BY created_at DESC";
+        const query = "SELECT *, (status = 'read' OR status = 'resolved') AS replied FROM contacts WHERE status = ? ORDER BY created_at DESC";
         db.query(query, [status], callback);
     },
 
     // Get pending contacts
     getPending: (callback) => {
-        const query = "SELECT * FROM contacts WHERE status = 'pending' ORDER BY created_at DESC";
+        const query = "SELECT *, 0 AS replied FROM contacts WHERE (status = 'pending' OR status = 'new') ORDER BY created_at DESC";
         db.query(query, callback);
     },
 
     // Get unread contacts - FIXED: use status = 'pending'
     getUnread: (callback) => {
-        const query = "SELECT * FROM contacts WHERE status = 'pending' ORDER BY created_at DESC";
+        const query = "SELECT *, 0 AS replied FROM contacts WHERE (status = 'pending' OR status = 'new') ORDER BY created_at DESC";
         db.query(query, callback);
     },
 
     // Get unreplied contacts - FIXED: use status = 'pending'
     getUnreplied: (callback) => {
-        const query = "SELECT * FROM contacts WHERE status = 'pending' ORDER BY created_at DESC";
+        const query = "SELECT *, 0 AS replied FROM contacts WHERE (status = 'pending' OR status = 'new') ORDER BY created_at DESC";
         db.query(query, callback);
     },
 
     // Get replied contacts - FIXED: use status = 'read'
     getReplied: (callback) => {
-        const query = "SELECT * FROM contacts WHERE status = 'read' ORDER BY created_at DESC";
+        const query = "SELECT *, 1 AS replied FROM contacts WHERE (status = 'read' OR status = 'resolved') ORDER BY created_at DESC";
         db.query(query, callback);
     },
 
@@ -89,10 +89,10 @@ const Contact = {
         const query = `
             SELECT 
                 COUNT(*) as total,
-                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-                SUM(CASE WHEN status = 'read' THEN 1 ELSE 0 END) as replied,
-                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as unread,
-                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as unreplied,
+                SUM(CASE WHEN status = 'pending' OR status = 'new' THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN status = 'read' OR status = 'resolved' THEN 1 ELSE 0 END) as replied,
+                SUM(CASE WHEN status = 'pending' OR status = 'new' THEN 1 ELSE 0 END) as unread,
+                SUM(CASE WHEN status = 'pending' OR status = 'new' THEN 1 ELSE 0 END) as unreplied,
                 SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved
             FROM contacts
         `;

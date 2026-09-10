@@ -15,7 +15,8 @@ import { useAuth } from "../context/AuthContext";
 const ProtectedRoute = ({
   roles = [],
   redirectTo = "/login",
-  adminRedirect = "/admin-login",
+  adminRedirect: propAdminRedirect,
+  AdminRedirect,
   unauthorizedRedirect = "/",
 }) => {
   const {
@@ -26,15 +27,20 @@ const ProtectedRoute = ({
 
   const location = useLocation();
 
+  const effectiveAdminRedirect =
+    propAdminRedirect || AdminRedirect || "/Admin-login";
+
   // =========================================
   // AUTH INITIALIZATION
-  //
-  // Do NOT show a full-screen loading screen.
-  // Wait silently until AuthContext finishes.
   // =========================================
 
   if (loading || initializing) {
-    return null;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+        <p className="mt-4 text-sm font-semibold text-gray-600">Verifying access...</p>
+      </div>
+    );
   }
 
   // =========================================
@@ -43,13 +49,13 @@ const ProtectedRoute = ({
 
   if (!user) {
     const adminRoute =
-      location.pathname.startsWith("/admin");
+      location.pathname.toLowerCase().startsWith("/admin");
 
     return (
       <Navigate
         to={
           adminRoute
-            ? adminRedirect
+            ? effectiveAdminRedirect
             : redirectTo
         }
         state={{

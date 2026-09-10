@@ -50,7 +50,9 @@ export const contactService = {
   getAll: async () => {
     try {
       const response = await api.get('/contacts');
-      return response.data;
+      if (Array.isArray(response.data)) return response.data;
+      if (Array.isArray(response.data?.data)) return response.data.data;
+      return [];
     } catch (error) {
       console.error('Error fetching contacts:', error);
       return []; // Return empty array on error
@@ -100,7 +102,9 @@ export const contactService = {
   getPending: async () => {
     try {
       const response = await api.get('/contacts/pending');
-      return response.data;
+      if (Array.isArray(response.data)) return response.data;
+      if (Array.isArray(response.data?.data)) return response.data.data;
+      return [];
     } catch (error) {
       console.error('Error fetching pending contacts:', error);
       return []; // Return empty array on error
@@ -110,7 +114,9 @@ export const contactService = {
   getReplied: async () => {
     try {
       const response = await api.get('/contacts/replied');
-      return response.data;
+      if (Array.isArray(response.data)) return response.data;
+      if (Array.isArray(response.data?.data)) return response.data.data;
+      return [];
     } catch (error) {
       console.error('Error fetching replied contacts:', error);
       return []; // Return empty array on error
@@ -120,7 +126,9 @@ export const contactService = {
   getStats: async () => {
     try {
       const response = await api.get('/contacts/stats');
-      return response.data;
+      if (response.data?.data) return response.data.data;
+      if (response.data?.total !== undefined) return response.data;
+      return response.data || { total: 0, pending: 0, replied: 0 };
     } catch (error) {
       console.error('Error fetching contact stats:', error);
       // Return default stats on error

@@ -1,5 +1,6 @@
 // src/components/Newsletter.jsx
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   FaEnvelope,
   FaGift,
@@ -16,13 +17,22 @@ import {
 import { newsletterService } from '../services/newsletterService';
 
 const Newsletter = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(location.pathname === '/newsletter');
   const [formData, setFormData] = useState({ name: "", email: "" });
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
+
+  // Open automatically if route is /newsletter
+  useEffect(() => {
+    if (location.pathname === '/newsletter') {
+      setIsOpen(true);
+    }
+  }, [location.pathname]);
 
   // Listen for custom event to open newsletter
   useEffect(() => {
@@ -85,6 +95,9 @@ const Newsletter = () => {
         setSubmitted(false);
         setSubmitSuccess(false);
         setSubmitMessage("");
+        if (location.pathname === '/newsletter') {
+          navigate('/', { replace: true });
+        }
       }, 4000);
 
     } catch (error) {
@@ -107,6 +120,9 @@ const Newsletter = () => {
     setSubmitSuccess(false);
     setSubmitMessage("");
     setError("");
+    if (location.pathname === '/newsletter') {
+      navigate('/', { replace: true });
+    }
   };
 
   // Keyboard shortcut to open newsletter (Ctrl+Shift+N)

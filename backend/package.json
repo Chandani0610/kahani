@@ -7,6 +7,7 @@
     "start": "node src/server.js",
     "dev": "cross-env NODE_ENV=development nodemon src/server.js",
     "prod": "NODE_ENV=production node src/server.js",
+    "kill-port": "npx kill-port 5000",
     "test": "NODE_ENV=test jest",
     "seed": "node src/scripts/seedDatabase.js",
     "seed:dev": "NODE_ENV=development node src/scripts/seedDatabase.js"
