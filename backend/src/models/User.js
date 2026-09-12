@@ -57,6 +57,7 @@ class UserModel {
         email,
         password,
         phone,
+        profile_image,
         role,
         status,
         created_at,
@@ -79,6 +80,7 @@ class UserModel {
         name,
         email,
         phone,
+        profile_image,
         role,
         status,
         created_at,
@@ -100,6 +102,7 @@ class UserModel {
         name,
         email,
         phone,
+        profile_image,
         role,
         status,
         created_at,
@@ -115,9 +118,9 @@ class UserModel {
   // Update User
   // ==========================================
   static async update(id, userData) {
-    const { name, email, phone, role, status } = userData;
+    const { name, email, phone, role, status, profile_image } = userData;
 
-    const sql = `
+    let sql = `
       UPDATE users
       SET
         name=?,
@@ -125,18 +128,18 @@ class UserModel {
         phone=?,
         role=?,
         status=?
-      WHERE id=?
     `;
+    const params = [name, email, phone, role, status];
 
-    const result = await query(sql, [
-      name,
-      email,
-      phone,
-      role,
-      status,
-      id,
-    ]);
+    if (profile_image !== undefined) {
+      sql += `, profile_image=?`;
+      params.push(profile_image);
+    }
 
+    sql += ` WHERE id=?`;
+    params.push(id);
+
+    const result = await query(sql, params);
     return result.affectedRows > 0;
   }
 

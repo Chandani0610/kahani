@@ -1,5 +1,4 @@
-// src/components/StoryModal.jsx
-
+import { Link } from "react-router-dom";
 import {
   FaTimes,
   FaUserFriends,
@@ -19,7 +18,7 @@ const API_BASE_URL =
 // DEFAULT IMAGE
 // =========================================
 
-const DEFAULT_IMAGE = "/images/Stories/default.avif";
+const DEFAULT_IMAGE = "/images/Stories/Adventuretales.avif";
 
 // =========================================
 // IMAGE URL HELPER
@@ -685,32 +684,46 @@ const StoryModal = ({
             flex-shrink-0
           "
         >
-          <button
-            onClick={onClose}
-            className="
-              px-10
-              py-3
-              bg-gradient-to-b
-              from-green-400
-              to-emerald-500
-              hover:brightness-105
-              text-white
-              rounded-full
-              font-black
-              shadow-[0_4px_0_#059669]
-              border-b-2
-              border-emerald-600
-              active:translate-y-1
-              active:shadow-none
-              transition-all
-              text-base
-              w-full
-              sm:w-auto
-              tracking-wide
-            "
-          >
-            I'm Done Reading! 😊🎉
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 max-w-xl mx-auto w-full">
+            <Link
+              to={`/story/${story.id || story._id}`}
+              state={{ cardImage: imageUrl, story }}
+              onClick={onClose}
+              className="text-amber-700 hover:text-amber-800 font-black text-sm flex items-center gap-1.5 py-2 px-4 rounded-xl hover:bg-amber-50 transition-colors"
+            >
+              <FaBookOpen className="text-amber-600" />
+              <span>Open Full Story Page 📖</span>
+            </Link>
+
+            <button
+              onClick={onClose}
+              className="
+                px-8
+                py-3
+                bg-gradient-to-b
+                from-green-400
+                to-emerald-500
+                hover:brightness-105
+                text-white
+                rounded-full
+                font-black
+                shadow-[0_4px_0_#059669]
+                border-b-2
+                border-emerald-600
+                active:translate-y-1
+                active:shadow-none
+                transition-all
+                text-sm
+                sm:text-base
+                w-full
+                sm:w-auto
+                tracking-wide
+                cursor-pointer
+              "
+            >
+              I'm Done Reading! 😊🎉
+            </button>
+          </div>
         </div>
       </div>
     </div>

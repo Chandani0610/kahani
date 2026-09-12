@@ -93,5 +93,18 @@ router.post(
     logout
 );
 
+// Forgot Password
+router.post(
+    "/forgot-password",
+    validate(forgotPasswordValidation),
+    forgotPassword
+);
+
+// Reset Password
+router.post(
+    "/reset-password",
+    validate(resetPasswordValidation),
+    resetPassword
+);
 
 module.exports = router;

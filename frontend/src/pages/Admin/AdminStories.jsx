@@ -821,24 +821,22 @@ export default function AdminStories() {
       ====================================================== */}
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            Stories
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Story Studio
           </h1>
-
-          <p className="text-gray-600 mt-1">
-            Manage your KahaniLand stories
+          <p className="text-slate-500 mt-1 text-sm">
+            Curate, edit, and publish illustrated tales and fables for children
           </p>
         </div>
 
         <button
           type="button"
           onClick={handleAddStory}
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-semibold shadow-sm hover:shadow transition-all text-xs"
         >
-          <PlusIcon className="w-5 h-5" />
-          Add Story
+          <PlusIcon className="w-4 h-4" />
+          Add New Story
         </button>
       </div>
 
@@ -846,22 +844,18 @@ export default function AdminStories() {
           SEARCH
       ====================================================== */}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 mb-6">
         <div className="relative max-w-md">
-
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-
+          <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) =>
               setSearch(e.target.value)
             }
-            placeholder="Search stories..."
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Search stories by title or description..."
+            className="w-full pl-10 pr-4 py-2 bg-slate-50/50 border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm placeholder:text-slate-400 transition-all"
           />
-
         </div>
       </div>
 
@@ -870,35 +864,27 @@ export default function AdminStories() {
       ====================================================== */}
 
       {loading ? (
-        <div className="bg-white rounded-xl p-10 text-center">
-          <div className="animate-spin w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
-
-          <p className="text-gray-600">
+        <div className="bg-white rounded-2xl p-12 text-center border border-slate-200/80 shadow-sm">
+          <div className="animate-spin w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-slate-600 font-medium">
             Loading stories...
           </p>
         </div>
       ) : filteredStories.length === 0 ? (
-        <div className="bg-white rounded-xl p-10 text-center">
-
-          <PhotoIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-
-          <h3 className="text-lg font-semibold text-gray-800">
+        <div className="bg-white rounded-2xl p-16 text-center border border-slate-200/80 shadow-sm">
+          <PhotoIcon className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-slate-800">
             No stories found
           </h3>
-
-          <p className="text-gray-500 mt-1">
+          <p className="text-slate-500 text-sm mt-1">
             Add your first story to get started.
           </p>
-
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
           <div className="overflow-x-auto">
-
             <table className="min-w-full">
-
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-slate-50/70 border-b border-slate-200/80">
 
                 <tr>
 

@@ -221,20 +221,20 @@ const AdminNewsletters = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'sent':
-        return 'bg-green-100 text-green-700';
+        return 'bg-emerald-50 text-emerald-700 border border-emerald-200/80';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-700';
+        return 'bg-amber-50 text-amber-700 border border-amber-200/80';
       case 'failed':
-        return 'bg-red-100 text-red-700';
+        return 'bg-rose-50 text-rose-700 border border-rose-200/80';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-slate-100 text-slate-700 border border-slate-200';
     }
   };
 
   const getSubscriberStatusColor = (status) => {
     return status === 'active' 
-      ? 'bg-green-100 text-green-700' 
-      : 'bg-gray-100 text-gray-500';
+      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' 
+      : 'bg-slate-100 text-slate-600 border border-slate-200';
   };
 
   // Filter subscribers
@@ -314,92 +314,92 @@ const AdminNewsletters = () => {
       )}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Newsletters</h1>
-          <p className="text-gray-500 mt-1">Manage email newsletters and subscribers</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Newsletter Campaigns</h1>
+          <p className="text-slate-500 mt-1 text-sm">Design, schedule, and broadcast story highlights and subscriber updates</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setShowAddSubscribersModal(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+            className="px-3.5 py-2 bg-white text-slate-700 border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-2 text-xs font-semibold shadow-sm"
           >
-            <UserPlusIcon className="w-5 h-5" />
+            <UserPlusIcon className="w-4 h-4 text-slate-500" />
             Add Subscribers
           </button>
           <button
             onClick={handleExportSubscribers}
-            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2"
+            className="px-3.5 py-2 bg-white text-slate-700 border border-slate-200/80 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-2 text-xs font-semibold shadow-sm"
           >
-            <DocumentArrowDownIcon className="w-5 h-5" />
-            Export
+            <DocumentArrowDownIcon className="w-4 h-4 text-slate-500" />
+            Export CSV
           </button>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl transition-all flex items-center gap-2 text-xs font-semibold shadow-sm hover:shadow"
           >
-            <PlusIcon className="w-5 h-5" />
-            Create Newsletter
+            <PlusIcon className="w-4 h-4" />
+            Compose Newsletter
           </button>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-blue-500 p-4 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-medium">Total Newsletters</p>
-              <p className="text-2xl font-bold text-gray-800 mt-1">{newsletters.length}</p>
+              <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Campaigns</p>
+              <p className="text-2xl font-bold text-slate-900 mt-1">{newsletters.length}</p>
             </div>
-            <div className="p-3 bg-blue-500 rounded-xl">
-              <EnvelopeIcon className="w-6 h-6 text-white" />
+            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+              <EnvelopeIcon className="w-5 h-5" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-purple-500 p-4 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-medium">Total Subscribers</p>
-              <p className="text-2xl font-bold text-gray-800 mt-1">{subscribers.length}</p>
+              <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Subscribers</p>
+              <p className="text-2xl font-bold text-slate-900 mt-1">{subscribers.length}</p>
             </div>
-            <div className="p-3 bg-purple-500 rounded-xl">
-              <UsersIcon className="w-6 h-6 text-white" />
+            <div className="p-2.5 bg-purple-50 text-purple-600 rounded-xl">
+              <UsersIcon className="w-5 h-5" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-emerald-500 p-4 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-medium">Active</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">{activeSubscribers}</p>
+              <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Active</p>
+              <p className="text-2xl font-bold text-emerald-600 mt-1">{activeSubscribers}</p>
             </div>
-            <div className="p-3 bg-green-500 rounded-xl">
-              <CheckCircleIcon className="w-6 h-6 text-white" />
+            <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
+              <CheckCircleIcon className="w-5 h-5" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-slate-400 p-4 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-medium">Inactive</p>
-              <p className="text-2xl font-bold text-gray-500 mt-1">{inactiveSubscribers}</p>
+              <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Inactive</p>
+              <p className="text-2xl font-bold text-slate-600 mt-1">{inactiveSubscribers}</p>
             </div>
-            <div className="p-3 bg-gray-500 rounded-xl">
-              <XMarkIcon className="w-6 h-6 text-white" />
+            <div className="p-2.5 bg-slate-100 text-slate-600 rounded-xl">
+              <XMarkIcon className="w-5 h-5" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-amber-500 p-4 hover:shadow-md transition-all col-span-2 sm:col-span-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-medium">Sent</p>
-              <p className="text-2xl font-bold text-gray-800 mt-1">
+              <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Dispatched</p>
+              <p className="text-2xl font-bold text-amber-600 mt-1">
                 {newsletters.filter(n => n.status === 'sent').length}
               </p>
             </div>
-            <div className="p-3 bg-yellow-500 rounded-xl">
-              <CheckCircleIcon className="w-6 h-6 text-white" />
+            <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl">
+              <PaperAirplaneIcon className="w-5 h-5" />
             </div>
           </div>
         </div>
@@ -409,40 +409,40 @@ const AdminNewsletters = () => {
       <div className="flex items-center justify-between">
         <button
           onClick={() => setShowSubscribersList(!showSubscribersList)}
-          className="flex items-center gap-2 text-gray-700 font-medium hover:text-gray-900 transition-colors"
+          className="flex items-center gap-2 text-slate-700 font-semibold text-sm hover:text-slate-900 transition-colors bg-white px-4 py-2 rounded-xl border border-slate-200/80 shadow-sm"
         >
-          <UsersIcon className="w-5 h-5" />
-          <span>Subscribers List</span>
+          <UsersIcon className="w-4 h-4 text-emerald-600" />
+          <span>Audience Directory</span>
           {showSubscribersList ? (
-            <ChevronUpIcon className="w-4 h-4" />
+            <ChevronUpIcon className="w-4 h-4 text-slate-400" />
           ) : (
-            <ChevronDownIcon className="w-4 h-4" />
+            <ChevronDownIcon className="w-4 h-4 text-slate-400" />
           )}
-          <span className="text-sm text-gray-400 font-normal">
-            ({subscribers.length} total)
+          <span className="text-xs text-slate-400 font-normal ml-1">
+            ({subscribers.length} total subscribers)
           </span>
         </button>
       </div>
 
       {/* Subscribers List */}
       {showSubscribersList && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-4 border-b flex flex-col sm:flex-row gap-3">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+          <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search subscribers..."
+                placeholder="Search subscribers by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50/50 border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs"
               />
             </div>
             <div className="flex gap-2">
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                className="px-3.5 py-2 bg-slate-50/50 border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs text-slate-700 cursor-pointer"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -501,62 +501,62 @@ const AdminNewsletters = () => {
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-slate-50/70 border-b border-slate-200/80">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipients</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Campaign</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Target Audience</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Created</th>
+                  <th className="px-5 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-slate-100">
                 {newsletters.map((newsletter) => (
-                  <tr key={newsletter.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4">
+                  <tr key={newsletter.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="px-5 py-4">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{newsletter.title}</p>
-                        <p className="text-xs text-gray-500 truncate max-w-xs">{newsletter.content?.substring(0, 100)}...</p>
+                        <p className="text-sm font-semibold text-slate-900">{newsletter.title}</p>
+                        <p className="text-xs text-slate-400 truncate max-w-sm mt-0.5">{newsletter.content?.substring(0, 100)}...</p>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <UserIcon className="w-4 h-4" />
-                        {newsletter.recipientGroup || 'All'}
+                    <td className="px-5 py-4 text-xs text-slate-600 font-medium">
+                      <div className="flex items-center gap-1.5 bg-slate-100/70 px-2.5 py-1 rounded-lg w-fit text-slate-700">
+                        <UserIcon className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{newsletter.recipientGroup || 'All Subscribers'}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(newsletter.status)}`}>
+                    <td className="px-5 py-4">
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize border ${getStatusColor(newsletter.status)}`}>
                         {newsletter.status || 'pending'}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
-                        <CalendarIcon className="w-4 h-4" />
-                        {new Date(newsletter.created_at).toLocaleDateString()}
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-1 text-xs text-slate-500 font-medium">
+                        <CalendarIcon className="w-3.5 h-3.5 text-slate-400" />
+                        {new Date(newsletter.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right space-x-2">
+                    <td className="px-5 py-4 text-right space-x-1.5">
                       <button
                         onClick={() => handleView(newsletter)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="View"
+                        className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Preview"
                       >
                         <EyeIcon className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleSendNewsletter(newsletter)}
-                        className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                        title="Send"
+                        className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                        title="Send Campaign"
                       >
                         <PaperAirplaneIcon className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleEdit(newsletter)}
-                        className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                         title="Edit"
                       >
                         <PencilIcon className="w-4 h-4" />
@@ -566,7 +566,7 @@ const AdminNewsletters = () => {
                           setSelectedNewsletter(newsletter);
                           setShowDeleteModal(true);
                         }}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                         title="Delete"
                       >
                         <TrashIcon className="w-4 h-4" />

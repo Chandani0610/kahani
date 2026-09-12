@@ -17,6 +17,10 @@ import {
   PaperAirplaneIcon,
   InboxIcon,
   CalendarDaysIcon,
+  ArrowTrendingUpIcon,
+  SparklesIcon,
+  ChevronRightIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline';
 import { storyService } from '../../services/storyService';
 import { videoService } from '../../services/videoService';
@@ -24,7 +28,7 @@ import { contactService } from '../../services/contactService';
 import { newsletterService } from '../../services/newsletterService';
 import { userService } from '../../services/userService';
 
-// Dashboard Header Component with Date Picker
+// Modern Dashboard Header Component with Date Picker and Upgraded Stat Cards
 const DashboardHeader = ({ stats, subscribersToday }) => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -52,12 +56,37 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
 
+  const calendarRef = useRef(null);
+
   // Select date
   const selectDate = (day) => {
     const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
     setSelectedDate(newDate);
     setShowCalendar(false);
   };
+
+  // Close calendar when clicking outside (popover behavior, does not stop the page)
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+        setShowCalendar(false);
+      }
+    };
+    if (showCalendar) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showCalendar]);
+
+  // Close calendar on Escape key
+  useEffect(() => {
+    if (!showCalendar) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setShowCalendar(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCalendar]);
 
   // Check if date is today
   const isToday = (day) => {
@@ -80,93 +109,132 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
       value: stats.stories,
       change: "+8 this week",
       icon: BookOpenIcon,
-      iconBg: "bg-green-500",
-      wave: "text-green-400",
+      lightBg: "bg-emerald-50 text-emerald-600 border-emerald-100",
+      barColor: "bg-gradient-to-r from-emerald-500 to-teal-500",
+      topBorder: "border-t-emerald-500",
+      pctWidth: "75%",
     },
     {
       title: "Total Videos",
       value: stats.videos,
       change: "+3 this week",
       icon: VideoCameraIcon,
-      iconBg: "bg-purple-500",
-      wave: "text-purple-400",
+      lightBg: "bg-purple-50 text-purple-600 border-purple-100",
+      barColor: "bg-gradient-to-r from-purple-500 to-indigo-500",
+      topBorder: "border-t-purple-500",
+      pctWidth: "60%",
     },
     {
-      title: "Registered Users",
+      title: "Active Users",
       value: stats.users,
       change: "+18 this week",
       icon: UsersIcon,
-      iconBg: "bg-blue-500",
-      wave: "text-blue-400",
+      lightBg: "bg-blue-50 text-blue-600 border-blue-100",
+      barColor: "bg-gradient-to-r from-blue-500 to-cyan-500",
+      topBorder: "border-t-blue-500",
+      pctWidth: "85%",
     },
     {
-      title: "Contact Messages",
+      title: "Inquiries",
       value: stats.contacts,
       change: "+5 this week",
       icon: EnvelopeIcon,
-      iconBg: "bg-orange-500",
-      wave: "text-orange-400",
+      lightBg: "bg-amber-50 text-amber-600 border-amber-100",
+      barColor: "bg-gradient-to-r from-amber-500 to-orange-500",
+      topBorder: "border-t-amber-500",
+      pctWidth: "50%",
     },
     {
-      title: "Newsletter Subscribers",
+      title: "Subscribers",
       value: stats.subscribers,
       change: `+${subscribersToday} today`,
       icon: InboxIcon,
-      iconBg: "bg-pink-500",
-      wave: "text-pink-400",
+      lightBg: "bg-rose-50 text-rose-600 border-rose-100",
+      barColor: "bg-gradient-to-r from-rose-500 to-pink-500",
+      topBorder: "border-t-rose-500",
+      pctWidth: "90%",
     },
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900">
+    <div className="space-y-6">
+      {/* Top Banner with Ambient Background */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 bg-gradient-to-r from-emerald-700 via-teal-700 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-md relative">
+        {/* Subtle glowing ambient circles cleanly clipped to rounded-3xl boundary */}
+        <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+          <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
+          <div className="absolute bottom-0 left-1/3 -mb-10 w-52 h-52 rounded-full bg-emerald-400/20 blur-2xl" />
+        </div>
+
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-semibold tracking-wide text-emerald-100 mb-3 border border-white/20">
+            <SparklesIcon className="w-3.5 h-3.5 text-amber-300" />
+            <span>KahaniLand Management Studio</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
             Welcome Back, Admin! 👋
           </h1>
-          <p className="text-gray-500 mt-2 text-lg">
-            Here's what's happening in KahaniLand today.
+          <p className="text-emerald-100/90 mt-1.5 text-xs sm:text-sm font-medium max-w-xl">
+            Live overview of story publishing, animated videos, readers engagement, and incoming feedback.
           </p>
         </div>
 
-        <div className="relative">
+        {/* Date Button & Calendar Popover */}
+        <div className="relative z-30 flex-shrink-0" ref={calendarRef}>
           <button
-            onClick={() => setShowCalendar(!showCalendar)}
-            className="flex items-center gap-3 bg-white border rounded-xl px-5 py-3 shadow-sm hover:shadow-md transition-all duration-300 hover:border-green-400"
+            type="button"
+            onClick={() => setShowCalendar((prev) => !prev)}
+            className={`flex items-center gap-2.5 sm:gap-3 backdrop-blur-md border rounded-2xl px-4 py-2.5 shadow-sm transition-all text-white focus:outline-none cursor-pointer ${
+              showCalendar 
+                ? 'bg-white/25 border-white/50 shadow-md ring-2 ring-white/20' 
+                : 'bg-white/10 hover:bg-white/20 active:scale-95 border-white/25 hover:border-white/40'
+            }`}
+            aria-label="Toggle calendar"
+            aria-expanded={showCalendar}
           >
-            <CalendarDaysIcon className="w-6 h-6 text-gray-600" />
-            <span className="font-semibold text-gray-700">
+            <CalendarDaysIcon className="w-5 h-5 text-emerald-300 flex-shrink-0" />
+            <span className="font-semibold text-xs sm:text-sm tracking-tight">
               {selectedDate.toLocaleDateString('en-US', {
-                month: 'long',
+                month: 'short',
                 day: 'numeric',
                 year: 'numeric',
-                weekday: 'long',
+                weekday: 'short',
               })}
             </span>
           </button>
 
-          {/* Calendar Dropdown */}
+          {/* Calendar Popover (Floating Pop-type without blocking page) */}
           {showCalendar && (
-            <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-xl border p-4 z-50 w-80">
+            <div
+              role="dialog"
+              aria-modal="false"
+              aria-label="Choose date"
+              className="absolute right-0 mt-2.5 bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-100 p-5 z-50 w-80 max-w-[calc(100vw-2rem)] animate-in fade-in zoom-in-95 duration-150 ring-1 ring-slate-900/10 origin-top-right"
+            >
               {/* Calendar Header */}
               <div className="flex justify-between items-center mb-4">
                 <button 
+                  type="button"
                   onClick={prevMonth}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-800 transition-colors"
+                  aria-label="Previous month"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
-                <h3 className="text-lg font-bold text-gray-800">
-                  {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-                </h3>
+                <div className="text-center">
+                  <h3 className="text-sm font-bold text-slate-900">
+                    {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                  </h3>
+                </div>
                 <button 
+                  type="button"
                   onClick={nextMonth}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-800 transition-colors"
+                  aria-label="Next month"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
@@ -175,7 +243,7 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
               {/* Day Names */}
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {dayNames.map((day) => (
-                  <div key={day} className="text-center text-xs font-semibold text-gray-500 py-1">
+                  <div key={day} className="text-center text-[11px] font-bold text-slate-400 py-1">
                     {day}
                   </div>
                 ))}
@@ -184,7 +252,7 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
               {/* Calendar Days */}
               <div className="grid grid-cols-7 gap-1">
                 {Array.from({ length: firstDayOfMonth }).map((_, index) => (
-                  <div key={`empty-${index}`} className="h-10"></div>
+                  <div key={`empty-${index}`} className="h-8"></div>
                 ))}
                 
                 {Array.from({ length: daysInMonth }).map((_, index) => {
@@ -194,15 +262,16 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
                   
                   return (
                     <button
+                      type="button"
                       key={day}
                       onClick={() => selectDate(day)}
                       className={`
-                        h-10 rounded-lg text-sm font-medium transition-all duration-200
+                        h-8 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center
                         ${isSelectedDate 
-                          ? 'bg-green-500 text-white hover:bg-green-600' 
+                          ? 'bg-emerald-600 text-white shadow-xs font-bold ring-2 ring-emerald-400/40' 
                           : isTodayDate 
-                            ? 'bg-green-50 text-green-600 border-2 border-green-400 hover:bg-green-100' 
-                            : 'hover:bg-gray-100 text-gray-700'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 font-bold' 
+                            : 'hover:bg-slate-100 text-slate-700'
                         }
                       `}
                     >
@@ -213,19 +282,21 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
               </div>
 
               {/* Quick Actions */}
-              <div className="mt-4 pt-4 border-t flex gap-2">
+              <div className="mt-4 pt-3 border-t border-slate-100 flex gap-2">
                 <button
+                  type="button"
                   onClick={() => {
                     const today = new Date();
                     setSelectedDate(today);
                     setCurrentMonth(today);
                     setShowCalendar(false);
                   }}
-                  className="flex-1 px-3 py-2 text-sm bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors font-medium"
+                  className="flex-1 px-3 py-1.5 text-xs bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition-colors font-bold"
                 >
                   Today
                 </button>
                 <button
+                  type="button"
                   onClick={() => {
                     const yesterday = new Date();
                     yesterday.setDate(yesterday.getDate() - 1);
@@ -233,74 +304,61 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
                     setCurrentMonth(yesterday);
                     setShowCalendar(false);
                   }}
-                  className="flex-1 px-3 py-2 text-sm bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                  className="flex-1 px-3 py-1.5 text-xs bg-slate-50 text-slate-600 rounded-xl hover:bg-slate-100 transition-colors font-semibold"
                 >
                   Yesterday
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCalendar(false)}
+                  className="px-3 py-1.5 text-xs bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors font-semibold"
+                >
+                  Close
+                </button>
               </div>
-
-              {/* Close button */}
-              <button
-                onClick={() => setShowCalendar(false)}
-                className="mt-3 w-full px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-lg transition-colors"
-              >
-                Close
-              </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+      {/* Modern Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
         {statCards.map((item, index) => {
           const Icon = item.icon;
 
           return (
             <div
               key={index}
-              className="bg-white rounded-2xl border shadow-sm p-5 hover:shadow-lg transition-all duration-300"
+              className={`bg-white rounded-2xl border border-slate-200/80 border-t-4 ${item.topBorder} p-5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between`}
             >
-              <div className="flex gap-4">
-                <div
-                  className={`${item.iconBg} w-16 h-16 rounded-2xl flex items-center justify-center shadow-md flex-shrink-0`}
-                >
-                  <Icon className="w-9 h-9 text-white" />
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center border ${item.lightBg} shadow-xs`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                    <ArrowTrendingUpIcon className="w-3 h-3" />
+                    {item.change}
+                  </span>
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <p className="text-gray-500 text-sm font-semibold truncate">
-                    {item.title}
-                  </p>
-
-                  <h2 className="text-4xl font-bold text-gray-900 mt-1">
+                <div className="mt-4">
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">
                     {item.value}
                   </h2>
-
-                  <p className="text-green-500 text-sm font-semibold mt-1">
-                    {item.change}
+                  <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">
+                    {item.title}
                   </p>
                 </div>
               </div>
 
-              {/* Bottom Wave */}
-              <div className="mt-5">
-                <svg
-                  viewBox="0 0 120 20"
-                  className={`w-full h-6 ${item.wave}`}
-                  fill="none"
-                >
-                  <path
-                    d="M0 10
-                       C10 2 20 18 30 10
-                       S50 2 60 10
-                       S80 18 90 10
-                       S110 2 120 10"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
+              <div className="mt-4 pt-3 border-t border-slate-100">
+                <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${item.barColor} rounded-full transition-all duration-500`}
+                    style={{ width: item.pctWidth }}
                   />
-                </svg>
+                </div>
               </div>
             </div>
           );
@@ -310,7 +368,7 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
   );
 };
 
-// Dashboard Middle Component with 12-month chart
+// Modern Dashboard Middle Component with 12-month chart, Quick Actions & Newsletter widget
 const DashboardMiddle = ({ 
   monthlyData, 
   onAddStory, 
@@ -323,30 +381,38 @@ const DashboardMiddle = ({
   const actions = [
     {
       title: "Add New Story",
+      desc: "Publish illustrated story",
       icon: PlusIcon,
-      bg: "from-green-50 to-green-100",
-      iconBg: "bg-green-500",
+      bg: "hover:bg-emerald-50/70",
+      iconBg: "bg-emerald-100 text-emerald-700",
+      borderColor: "border-emerald-200/60",
       onClick: onAddStory,
     },
     {
       title: "Upload Video",
+      desc: "Add animated video tale",
       icon: ArrowUpTrayIcon,
-      bg: "from-purple-50 to-purple-100",
-      iconBg: "bg-purple-500",
+      bg: "hover:bg-purple-50/70",
+      iconBg: "bg-purple-100 text-purple-700",
+      borderColor: "border-purple-200/60",
       onClick: onUploadVideo,
     },
     {
       title: "Manage Users",
+      desc: "View readers & roles",
       icon: UsersIcon,
-      bg: "from-blue-50 to-blue-100",
-      iconBg: "bg-blue-500",
+      bg: "hover:bg-blue-50/70",
+      iconBg: "bg-blue-100 text-blue-700",
+      borderColor: "border-blue-200/60",
       onClick: onManageUsers,
     },
     {
       title: "Send Newsletter",
+      desc: "Broadcast story club emails",
       icon: PaperAirplaneIcon,
-      bg: "from-yellow-50 to-yellow-100",
-      iconBg: "bg-orange-500",
+      bg: "hover:bg-amber-50/70",
+      iconBg: "bg-amber-100 text-amber-700",
+      borderColor: "border-amber-200/60",
       onClick: onSendNewsletter,
     },
   ];
@@ -372,109 +438,158 @@ const DashboardMiddle = ({
   return (
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
       {/* Chart - 12 Months Stories Uploaded */}
-      <div className="xl:col-span-6 bg-white rounded-2xl shadow-sm border p-6">
-        <h2 className="text-xl font-bold text-gray-800">
-          Stories Uploaded
-          <span className="text-gray-400 font-normal text-sm">
-            {" "}
-            (This Year)
-          </span>
-        </h2>
-
-        <div className="flex justify-between items-end h-72 mt-8">
-          {months.map((item) => (
-            <div key={item.month} className="flex flex-col items-center">
-              <span className="text-xs font-semibold mb-2 text-gray-600">
-                {item.value}
-              </span>
-
-              <div
-                className="w-5 rounded-full bg-gradient-to-t from-green-500 to-green-400 transition-all duration-500 hover:scale-110"
-                style={{
-                  height: `${(item.value / maxValue) * 200 + 10}px`,
-                  minHeight: '10px',
-                }}
-              ></div>
-
-              <span className="text-xs mt-3 text-gray-500">
-                {item.month}
-              </span>
+      <div className="xl:col-span-6 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 flex flex-col justify-between">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-slate-900">
+                  Stories Uploaded
+                </h2>
+                <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full border border-slate-200/60">
+                  2026 Velocity
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">
+                Monthly distribution of published stories
+              </p>
             </div>
-          ))}
+            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/50">
+              Peak: {maxValue} Stories
+            </span>
+          </div>
+
+          <div className="relative flex justify-between items-end h-64 mt-8 pt-6 border-b border-slate-100">
+            {/* Subtle Horizontal Guidelines */}
+            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-40">
+              <div className="border-b border-dashed border-slate-200 w-full" />
+              <div className="border-b border-dashed border-slate-200 w-full" />
+              <div className="border-b border-dashed border-slate-200 w-full" />
+            </div>
+
+            {months.map((item) => {
+              const heightPercent = Math.max((item.value / maxValue) * 100, 6);
+              return (
+                <div key={item.month} className="group relative flex flex-col items-center z-10 flex-1">
+                  {/* Tooltip on hover */}
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 absolute -top-8 bg-slate-900 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-md pointer-events-none whitespace-nowrap z-20">
+                    {item.value} {item.value === 1 ? 'Story' : 'Stories'}
+                  </div>
+
+                  <span className="text-[11px] font-bold text-slate-600 mb-1.5 group-hover:text-emerald-600 transition-colors">
+                    {item.value > 0 ? item.value : ''}
+                  </span>
+
+                  <div className="w-5 sm:w-6 h-48 flex items-end justify-center">
+                    <div
+                      className="w-full rounded-t-lg bg-gradient-to-t from-emerald-600 to-teal-400 group-hover:from-emerald-500 group-hover:to-teal-300 transition-all duration-300 shadow-xs"
+                      style={{ height: `${heightPercent}%` }}
+                    />
+                  </div>
+
+                  <span className="text-[11px] font-semibold text-slate-400 mt-2.5 group-hover:text-slate-800 transition-colors">
+                    {item.month}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="xl:col-span-4 bg-white rounded-2xl shadow-sm border p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">
-          Quick Actions
-        </h2>
+      <div className="xl:col-span-3 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 flex flex-col justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-base font-bold text-slate-900">
+              Quick Actions
+            </h2>
+            <SparklesIcon className="w-4 h-4 text-amber-500" />
+          </div>
+          <p className="text-xs text-slate-400 font-medium mb-4">
+            Common administrative workflows
+          </p>
 
-        <div className="grid grid-cols-2 gap-5">
-          {actions.map((action, index) => {
-            const Icon = action.icon;
+          <div className="space-y-2.5">
+            {actions.map((action, index) => {
+              const Icon = action.icon;
 
-            return (
-              <button
-                key={index}
-                onClick={action.onClick}
-                className={`bg-gradient-to-br ${action.bg}
-                rounded-2xl h-36
-                flex flex-col justify-center items-center
-                hover:shadow-lg transition-all duration-300
-                hover:-translate-y-1 border border-transparent hover:border-gray-200`}
-              >
-                <div
-                  className={`${action.iconBg}
-                  w-12 h-12 rounded-full
-                  flex items-center justify-center mb-3`}
+              return (
+                <button
+                  key={index}
+                  onClick={action.onClick}
+                  className={`w-full p-3 rounded-xl border border-slate-200/70 bg-slate-50/50 ${action.bg} ${action.borderColor} flex items-center justify-between text-left hover:shadow-xs transition-all duration-200 group focus:outline-none`}
                 >
-                  <Icon className="w-6 h-6 text-white" />
-                </div>
-
-                <p className="font-semibold text-gray-700 text-center text-sm px-2">
-                  {action.title}
-                </p>
-              </button>
-            );
-          })}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${action.iconBg} shadow-2xs`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-800 group-hover:text-slate-900 truncate">
+                        {action.title}
+                      </p>
+                      <p className="text-[11px] text-slate-400 truncate">
+                        {action.desc}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRightIcon className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors flex-shrink-0 ml-2" />
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Newsletter Subscribers */}
-      <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border p-6 flex flex-col justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <EnvelopeIcon className="w-7 h-7 text-pink-500" />
-            <h2 className="font-bold text-gray-800">
-              Newsletter Subscribers
-            </h2>
+      {/* Newsletter Subscribers Hero Card */}
+      <div className="xl:col-span-3 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl border border-slate-800 shadow-md p-6 flex flex-col justify-between relative overflow-hidden">
+        {/* Glow ambient highlight */}
+        <div className="absolute top-0 right-0 -mr-12 -mt-12 w-40 h-40 bg-pink-500/20 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -ml-12 -mb-12 w-40 h-40 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-pink-400">
+              <EnvelopeIcon className="w-5 h-5" />
+            </div>
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">
+              <SparklesIcon className="w-3 h-3" />
+              Active Club
+            </span>
           </div>
 
-          <div className="mt-8">
-            <h1 className="text-5xl font-bold">
-              {totalSubscribers || 0}
-            </h1>
-            <p className="text-gray-500 mt-2">
+          <div className="mt-6">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
               Total Subscribers
             </p>
+            <h3 className="text-4xl font-black tracking-tight text-white mt-1">
+              {totalSubscribers || 0}
+            </h3>
 
-            <hr className="my-6" />
-
-            <h2 className="text-3xl font-bold text-green-500">
-              {newToday || 0}
-            </h2>
-            <p className="text-green-600 font-medium">
-              New Today
-            </p>
+            <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="text-2xl font-bold text-emerald-400">
+                  +{newToday || 0}
+                </span>
+                <p className="text-[11px] text-slate-400 font-medium">Joined Today</p>
+              </div>
+              <div className="text-right">
+                <span className="text-sm font-bold text-pink-400">Weekly</span>
+                <p className="text-[11px] text-slate-400 font-medium">Auto-Digest</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/2436/2436636.png"
-          alt="reading"
-          className="w-36 self-end"
-        />
+        <div className="relative z-10 mt-6 pt-4 border-t border-slate-800">
+          <button
+            onClick={onSendNewsletter}
+            className="w-full py-2.5 px-4 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-xl text-xs font-bold tracking-tight shadow-md transition-all flex items-center justify-center gap-2"
+          >
+            <PaperAirplaneIcon className="w-3.5 h-3.5" />
+            <span>Compose Newsletter</span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -927,196 +1042,238 @@ const Dashboard = () => {
         newToday={subscribersToday}
       />
 
-      {/* Recent Stories & Videos with Vertical Scroll */}
+      {/* Recent Stories & Videos with Clean Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Stories */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-800">Recent Stories</h3>
-            <button
-              onClick={() => navigate('/admin/stories')}
-              className="text-sm text-green-500 hover:text-green-600 font-medium flex items-center gap-1"
-            >
-              View All <ArrowRightIcon className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
-            {recentStories.length === 0 ? (
-              <p className="text-gray-400 text-center py-4">No stories yet</p>
-            ) : (
-              recentStories.map((story) => (
-                <div
-                  key={story.id}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
-                >
-                  <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-                    {story.image_url || story.image ? (
-                      <img
-                        src={story.image_url || story.image}
-                        alt={story.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <BookOpenIcon className="w-6 h-6 text-gray-400 m-3" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{story.title}</p>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span>{story.category}</span>
-                      <span>•</span>
-                      <span>{story.age_group}</span>
+        <div className="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-slate-900">Recent Stories</h3>
+                <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                  {recentStories.length} Published
+                </span>
+              </div>
+              <button
+                onClick={() => navigate('/admin/stories')}
+                className="text-xs text-emerald-600 hover:text-emerald-700 font-bold flex items-center gap-1 group"
+              >
+                <span>View All</span>
+                <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
+            <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
+              {recentStories.length === 0 ? (
+                <div className="text-center py-10 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                  <BookOpenIcon className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                  <p className="text-xs font-semibold text-slate-500">No stories found yet</p>
+                </div>
+              ) : (
+                recentStories.map((story) => (
+                  <div
+                    key={story.id}
+                    className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-100 hover:border-slate-200/80 hover:bg-slate-50/70 transition-all duration-150"
+                  >
+                    <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-slate-100 border border-slate-200/60">
+                      {story.image_url || story.image ? (
+                        <img
+                          src={story.image_url || story.image}
+                          alt={story.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-emerald-50 text-emerald-500">
+                          <BookOpenIcon className="w-5 h-5" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-slate-800 truncate">{story.title}</p>
+                      <div className="flex items-center gap-1.5 mt-1 text-[11px]">
+                        <span className="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-md border border-emerald-200/50 truncate">
+                          {story.category}
+                        </span>
+                        <span className="text-slate-400">•</span>
+                        <span className="text-slate-400 truncate">{story.age_group || 'All Ages'}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleViewStory(story)}
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View Story"
+                      >
+                        <EyeIcon className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleEditStory(story)}
+                        className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                        title="Edit Story"
+                      >
+                        <PencilIcon className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => openDeleteModal(story, 'story')}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                        title="Delete Story"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => handleViewStory(story)}
-                      className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg"
-                      title="View"
-                    >
-                      <EyeIcon className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleEditStory(story)}
-                      className="p-1 text-green-600 hover:bg-green-50 rounded-lg"
-                      title="Edit"
-                    >
-                      <PencilIcon className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(story, 'story')}
-                      className="p-1 text-red-600 hover:bg-red-50 rounded-lg"
-                      title="Delete"
-                    >
-                      <TrashIcon className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
 
         {/* Recent Videos */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-800">Recent Videos</h3>
-            <button
-              onClick={() => navigate('/admin/videos')}
-              className="text-sm text-purple-500 hover:text-purple-600 font-medium flex items-center gap-1"
-            >
-              View All <ArrowRightIcon className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
-            {recentVideos.length === 0 ? (
-              <p className="text-gray-400 text-center py-4">No videos yet</p>
-            ) : (
-              recentVideos.map((video) => (
-                <div
-                  key={video.id}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
-                >
-                  <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 relative">
-                    {video.thumbnail ? (
-                      <img
-                        src={video.thumbnail}
-                        alt={video.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <VideoCameraIcon className="w-6 h-6 text-gray-400 m-3" />
-                    )}
-                    {video.duration && (
-                      <span className="absolute bottom-0 right-0 bg-black/70 text-white text-[10px] px-1 rounded">
-                        {video.duration}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{video.title}</p>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span>{video.category}</span>
-                      <span>•</span>
-                      <span>{video.age_group || 'All Ages'}</span>
+        <div className="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-slate-900">Recent Videos</h3>
+                <span className="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200/60">
+                  {recentVideos.length} Videos
+                </span>
+              </div>
+              <button
+                onClick={() => navigate('/admin/videos')}
+                className="text-xs text-purple-600 hover:text-purple-700 font-bold flex items-center gap-1 group"
+              >
+                <span>View All</span>
+                <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
+            <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
+              {recentVideos.length === 0 ? (
+                <div className="text-center py-10 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                  <VideoCameraIcon className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                  <p className="text-xs font-semibold text-slate-500">No videos uploaded yet</p>
+                </div>
+              ) : (
+                recentVideos.map((video) => (
+                  <div
+                    key={video.id}
+                    className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-100 hover:border-slate-200/80 hover:bg-slate-50/70 transition-all duration-150"
+                  >
+                    <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-slate-100 relative border border-slate-200/60">
+                      {video.thumbnail ? (
+                        <img
+                          src={video.thumbnail}
+                          alt={video.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-purple-50 text-purple-500">
+                          <VideoCameraIcon className="w-5 h-5" />
+                        </div>
+                      )}
+                      {video.duration && (
+                        <span className="absolute bottom-1 right-1 bg-slate-900/80 text-white font-mono text-[9px] px-1 rounded">
+                          {video.duration}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-slate-800 truncate">{video.title}</p>
+                      <div className="flex items-center gap-1.5 mt-1 text-[11px]">
+                        <span className="bg-purple-50 text-purple-700 font-semibold px-2 py-0.5 rounded-md border border-purple-200/50 truncate">
+                          {video.category}
+                        </span>
+                        <span className="text-slate-400">•</span>
+                        <span className="text-slate-400 truncate">{video.age_group || 'All Ages'}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleViewVideo(video)}
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View Video"
+                      >
+                        <EyeIcon className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleEditVideo(video)}
+                        className="p-1.5 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                        title="Edit Video"
+                      >
+                        <PencilIcon className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => openDeleteModal(video, 'video')}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                        title="Delete Video"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => handleViewVideo(video)}
-                      className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg"
-                      title="View"
-                    >
-                      <EyeIcon className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleEditVideo(video)}
-                      className="p-1 text-green-600 hover:bg-green-50 rounded-lg"
-                      title="Edit"
-                    >
-                      <PencilIcon className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(video, 'video')}
-                      className="p-1 text-red-600 hover:bg-red-50 rounded-lg"
-                      title="Delete"
-                    >
-                      <TrashIcon className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Recent Contacts with Vertical Scroll and Click to View */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      {/* Recent Contacts & Inquiries with Clean List */}
+      <div className="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-gray-800">Recent Messages</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-bold text-slate-900">Recent Messages & Feedback</h3>
+            <span className="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200/60">
+              {recentContacts.length} Inquiries
+            </span>
+          </div>
           <button
             onClick={() => navigate('/admin/contacts')}
-            className="text-sm text-green-500 hover:text-green-600 font-medium flex items-center gap-1"
+            className="text-xs text-amber-700 hover:text-amber-800 font-bold flex items-center gap-1 group"
           >
-            View All <ArrowRightIcon className="w-4 h-4" />
+            <span>View All</span>
+            <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
-        <div className="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+        <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
           {recentContacts.length === 0 ? (
-            <p className="text-gray-400 text-center py-4">No messages</p>
+            <div className="text-center py-10 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+              <EnvelopeIcon className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-xs font-semibold text-slate-500">No inquiries or messages yet</p>
+            </div>
           ) : (
             recentContacts.map((contact) => (
               <div
                 key={contact.id}
                 onClick={() => handleViewContact(contact.id)}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer"
+                className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:border-slate-200/80 hover:bg-slate-50/70 transition-all duration-150 cursor-pointer"
               >
-                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <UsersIcon className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 font-bold flex items-center justify-center flex-shrink-0 text-sm border border-amber-200/60">
+                  {contact.name ? contact.name.charAt(0).toUpperCase() : 'U'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate">{contact.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{contact.email}</p>
-                  <p className="text-xs text-gray-400 truncate">{contact.subject || 'No subject'}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-bold text-slate-900 truncate">{contact.name}</p>
+                    <span className="text-[11px] text-slate-400">•</span>
+                    <span className="text-[11px] text-slate-400 truncate">{contact.email}</span>
+                  </div>
+                  <p className="text-xs font-medium text-slate-600 truncate mt-0.5">{contact.subject || 'No subject'}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5 flex-shrink-0">
                   <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       contact.replied
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-yellow-100 text-yellow-700'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                        : 'bg-amber-50 text-amber-700 border border-amber-200/60'
                     }`}
                   >
-                    {contact.replied ? 'Replied' : 'Pending'}
+                    {contact.replied ? '✓ Replied' : 'Pending'}
                   </span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleViewContact(contact.id);
                     }}
-                    className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg"
-                    title="View"
+                    className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                    title="View details"
                   >
                     <EyeIcon className="w-4 h-4" />
                   </button>

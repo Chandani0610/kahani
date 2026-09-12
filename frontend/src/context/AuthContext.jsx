@@ -121,6 +121,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post("/auth/login", {
         email: data.email.trim().toLowerCase(),
         password: data.password,
+        portal: data.portal || undefined,
       });
 
       console.log("Login Response:", response.data);
@@ -226,6 +227,53 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // ===========================
+  // FORGOT PASSWORD
+  // ===========================
+
+  const forgotPassword = useCallback(async (email) => {
+    setLoading(true);
+    setAuthError(null);
+
+    try {
+      const response = await api.post("/auth/forgot-password", {
+        email: email.trim().toLowerCase(),
+      });
+      return response.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Failed to process forgot password request";
+      setAuthError(message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // ===========================
+  // RESET PASSWORD
+  // ===========================
+
+  const resetPassword = useCallback(async ({ token, newPassword }) => {
+    setLoading(true);
+    setAuthError(null);
+
+    try {
+      const response = await api.post("/auth/reset-password", {
+        token: token.trim(),
+        newPassword,
+      });
+      return response.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Failed to reset password";
+      setAuthError(message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // ===========================
   // LOGOUT
   // ===========================
 
@@ -289,6 +337,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    forgotPassword,
+    resetPassword,
 
     refreshUserData,
     hasRole,

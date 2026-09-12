@@ -71,7 +71,7 @@ const StoryCard = ({ story, index, handleOpen }) => {
     const id = story?.id || story?._id;
 
     if (!id) {
-      return "/images/story-placeholder.jpg";
+      return "/images/Stories/Adventuretales.avif";
     }
 
     /*
@@ -105,35 +105,51 @@ const StoryCard = ({ story, index, handleOpen }) => {
     return `/api/stories/${id}/image`;
   }, [story]);
 
+  const formattedReadTime = useMemo(() => {
+    if (!story?.read_time) return "5 Min";
+    const rt = String(story.read_time);
+    return rt.toLowerCase().includes("min") ? rt : `${rt} Min`;
+  }, [story]);
+
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.15,
-        delay: index < 4 ? index * 0.02 : 0,
+        duration: 0.25,
+        delay: index < 6 ? index * 0.02 : 0,
       }}
       className="
         group
         bg-white
-        rounded-2xl
+        rounded-3xl
         overflow-hidden
-        shadow-lg
+        shadow-md
         hover:shadow-2xl
         transition-all
-        duration-200
-        hover:-translate-y-1
+        duration-300
+        hover:-translate-y-2
         cursor-pointer
-        border
-        border-white/20
+        border-2
+        border-amber-200/80
+        hover:border-amber-400
+        flex
+        flex-col
+        relative
       "
-      onClick={() => handleOpen(story)}
+      onClick={() =>
+        handleOpen(
+          story,
+          imageError
+            ? "/images/Stories/Adventuretales.avif"
+            : imageUrl
+        )
+      }
     >
       {/* =================================================
-          IMAGE
+          IMAGE (Focus on Top & Middle, Bottom Part Removed)
       ================================================== */}
-
-      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+      <div className="relative aspect-[4/3] overflow-hidden bg-amber-50/50 flex items-center justify-center">
         {!imageError ? (
           <img
             src={imageUrl}
@@ -142,11 +158,13 @@ const StoryCard = ({ story, index, handleOpen }) => {
               w-full
               h-full
               object-cover
+              object-top
+              origin-top
               group-hover:scale-105
               transition-transform
-              duration-200
+              duration-500
+              ease-out
             "
-
             loading={index < 4 ? "eager" : "lazy"}
             decoding="async"
             fetchPriority={index < 2 ? "high" : "auto"}
@@ -156,78 +174,26 @@ const StoryCard = ({ story, index, handleOpen }) => {
           />
         ) : (
           <img
-            src="/images/story-placeholder.jpg"
+            src="/images/Stories/Adventuretales.avif"
             alt={story.title || "Story"}
-            className="
-              w-full
-              h-full
-              object-cover
-            "
+            className="w-full h-full object-cover object-top"
           />
         )}
 
-        {/* =================================================
-            HOVER OVERLAY
-        ================================================== */}
-
-        <div
-          className="
-            absolute
-            inset-0
-            bg-gradient-to-t
-            from-black/60
-            via-transparent
-            to-transparent
-            opacity-0
-            group-hover:opacity-100
-            transition-opacity
-            duration-150
-            flex
-            items-center
-            justify-center
-          "
-        >
-          <div
-            className="
-              w-14
-              h-14
-              bg-yellow-400
-              rounded-full
-              flex
-              items-center
-              justify-center
-              shadow-xl
-            "
-          >
-            <FaBookOpen className="text-gray-900 text-xl" />
+        {/* Hover Book Glow */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+          <div className="w-12 h-12 bg-amber-400 text-amber-950 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-200">
+            <FaBookOpen className="text-xl" />
           </div>
         </div>
 
-        {/* =================================================
-            READ TIME
-        ================================================== */}
-
-        {story.read_time && (
-          <div
-            className="
-              absolute
-              bottom-3
-              right-3
-              bg-black/80
-              text-white
-              text-xs
-              font-bold
-              px-2.5
-              py-1
-              rounded-md
-              flex
-              items-center
-              gap-1
-            "
-          >
-            <FaClock className="text-yellow-400 text-[10px]" />
-
-            {story.read_time}
+        {/* Category Pill Top Left */}
+        {story.category && (
+          <div className="absolute top-3 left-3 z-10">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[11px] font-black text-amber-900 shadow-sm border border-amber-200/70">
+              <span>✨</span>
+              <span>{story.category}</span>
+            </span>
           </div>
         )}
       </div>
@@ -235,69 +201,35 @@ const StoryCard = ({ story, index, handleOpen }) => {
       {/* =================================================
           STORY CONTENT
       ================================================== */}
+      <div className="p-5 flex-1 flex flex-col justify-between bg-gradient-to-b from-white to-amber-50/25">
+        <div>
+          <h3 className="text-amber-950 font-black text-base sm:text-lg line-clamp-1 group-hover:text-amber-600 transition-colors leading-snug">
+            {story.title || "Untitled Story"}
+          </h3>
 
-      <div className="p-4">
-        <h3
-          className="
-            text-gray-800
-            font-bold
-            text-base
-            line-clamp-2
-            group-hover:text-yellow-600
-            transition-colors
-            duration-150
-          "
-        >
-          {story.title || "Untitled Story"}
-        </h3>
+          <p className="text-slate-500 text-xs sm:text-sm mt-1.5 line-clamp-2 leading-relaxed font-medium">
+            {story.description ||
+              story.story?.substring(0, 110) ||
+              "Explore this magical illustrated story adventure!"}
+          </p>
+        </div>
 
-        <p
-          className="
-            text-gray-600
-            text-sm
-            mt-1
-            line-clamp-2
-          "
-        >
-          {story.description ||
-            story.story?.substring(0, 100) ||
-            ""}
-        </p>
+        {/* Bottom Metadata & CTA Action */}
+        <div className="mt-4 pt-3 border-t border-amber-100/90 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-bold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-lg">
+              🎈 {story.age_group || "All Ages"}
+            </span>
+            <span className="text-xs font-bold text-amber-800 bg-amber-100/80 px-2 py-1 rounded-lg flex items-center gap-1">
+              <FaClock className="text-amber-600 text-[10px]" />
+              <span>{formattedReadTime}</span>
+            </span>
+          </div>
 
-        {story.category && (
-          <span
-            className="
-              inline-block
-              mt-2
-              px-3
-              py-1
-              bg-yellow-100
-              text-yellow-700
-              text-xs
-              font-semibold
-              rounded-full
-            "
-          >
-            {story.category}
-          </span>
-        )}
-
-        <div
-          className="
-            flex
-            items-center
-            justify-between
-            mt-2
-            gap-2
-          "
-        >
-          <span className="text-gray-400 text-xs truncate">
-            {story.age_group || "All Ages"}
-          </span>
-
-          <span className="text-gray-400 text-xs truncate">
-            {story.author || "Unknown"}
-          </span>
+          <div className="px-3.5 py-1.5 bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400 group-hover:from-amber-500 group-hover:to-orange-500 text-amber-950 font-black text-xs rounded-xl shadow-xs group-hover:shadow transition-all flex items-center gap-1.5 border-b border-amber-600">
+            <span>Read</span>
+            <span className="group-hover:translate-x-0.5 transition-transform">📖✨</span>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -546,9 +478,19 @@ const StoryCards = ({
   // OPEN STORY
   // ====================================================
 
-  const handleOpen = (story) => {
-    setSelectedStory(story);
-    setOpen(true);
+  const handleOpen = (story, currentImageUrl) => {
+    const id = story?.id || story?._id;
+    if (!id) return;
+
+    const finalImage =
+      currentImageUrl ||
+      (typeof story?.image === "string" && story.image.trim()) ||
+      (typeof story?.image_url === "string" && story.image_url.trim()) ||
+      `/api/stories/${id}/image`;
+
+    navigate(`/story/${id}`, {
+      state: { cardImage: finalImage, story },
+    });
   };
 
   // ====================================================

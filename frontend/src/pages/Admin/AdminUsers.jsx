@@ -15,7 +15,10 @@ import {
   ArrowLeftOnRectangleIcon,
   ArrowRightOnRectangleIcon,
   UserGroupIcon,
-  CalendarIcon
+  CalendarIcon,
+  Squares2X2Icon,
+  TableCellsIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -236,23 +239,24 @@ const AdminUsers = () => {
   // Get role badge color
   const getRoleBadge = (role) => {
     const badges = {
-      admin: 'bg-blue-100 text-blue-800 border-blue-200',
-      user: 'bg-green-100 text-green-800 border-green-200',
+      superadmin: 'bg-rose-50 text-rose-700 border-rose-200/80',
+      admin: 'bg-purple-50 text-purple-700 border-purple-200/80',
+      user: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
     };
-    return badges[role] || 'bg-gray-100 text-gray-800 border-gray-200';
+    return badges[role] || 'bg-slate-100 text-slate-700 border-slate-200';
   };
 
   // Get status badge
   const getStatusBadge = (status) => {
     switch(status) {
       case 'active':
-        return { color: 'bg-green-100 text-green-800 border-green-200', icon: <CheckCircleIcon className="w-3 h-3" /> };
+        return { color: 'bg-emerald-50 text-emerald-700 border-emerald-200/80', icon: <CheckCircleIcon className="w-3.5 h-3.5" /> };
       case 'inactive':
-        return { color: 'bg-red-100 text-red-800 border-red-200', icon: <XCircleIcon className="w-3 h-3" /> };
+        return { color: 'bg-rose-50 text-rose-700 border-rose-200/80', icon: <XCircleIcon className="w-3.5 h-3.5" /> };
       case 'pending':
-        return { color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: <ClockIcon className="w-3 h-3" /> };
+        return { color: 'bg-amber-50 text-amber-700 border-amber-200/80', icon: <ClockIcon className="w-3.5 h-3.5" /> };
       default:
-        return { color: 'bg-gray-100 text-gray-800 border-gray-200', icon: null };
+        return { color: 'bg-slate-100 text-slate-700 border-slate-200', icon: null };
     }
   };
 
@@ -296,135 +300,166 @@ const AdminUsers = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">User Management</h1>
-          <p className="text-gray-500 mt-1">View and manage all users in the system</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">User Directory</h1>
+          <p className="text-slate-500 mt-1 text-sm">View, filter, and manage registered members and administrative permissions</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1.5 bg-slate-200/60 p-1 rounded-xl border border-slate-200/80 self-start sm:self-auto">
           <button 
-            onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
-            className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+            onClick={() => setViewMode('grid')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              viewMode === 'grid' 
+                ? 'bg-white text-slate-900 shadow-sm' 
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
           >
-            {viewMode === 'grid' ? 'Table View' : 'Grid View'}
+            <Squares2X2Icon className="w-4 h-4" />
+            Grid
+          </button>
+          <button 
+            onClick={() => setViewMode('table')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              viewMode === 'table' 
+                ? 'bg-white text-slate-900 shadow-sm' 
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <TableCellsIcon className="w-4 h-4" />
+            Table
           </button>
         </div>
       </div>
 
-      {/* Statistics Cards - All Users */}
+      {/* Statistics Cards - Primary Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-blue-500 p-5 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-medium">Total Users</p>
-              <p className="text-2xl font-bold text-gray-800 mt-1">{stats.total}</p>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Users</p>
+              <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1.5">{stats.total}</p>
             </div>
-            <div className="p-3 bg-orange-50 rounded-xl">
-              <UserGroupIcon className="w-6 h-6 text-orange-600" />
+            <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
+              <UserGroupIcon className="w-6 h-6" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <ArrowTrendingUpIcon className="w-4 h-4 text-green-500 mr-1" />
-            <span className="text-green-500 font-medium">{stats.recentUsers}</span>
-            <span className="text-gray-400 ml-1">new this week</span>
+          <div className="mt-4 flex items-center text-xs font-medium text-emerald-600">
+            <ArrowTrendingUpIcon className="w-3.5 h-3.5 mr-1" />
+            <span>+{stats.recentUsers} this week</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-emerald-500 p-5 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-medium">Active Users</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">{stats.active}</p>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Active Accounts</p>
+              <p className="text-2xl sm:text-3xl font-bold text-emerald-600 mt-1.5">{stats.active}</p>
             </div>
-            <div className="p-3 bg-green-50 rounded-xl">
-              <CheckCircleIcon className="w-6 h-6 text-green-600" />
+            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl">
+              <CheckCircleIcon className="w-6 h-6" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="text-green-500 font-medium">
+          <div className="mt-4 flex items-center text-xs text-slate-500">
+            <span className="text-emerald-600 font-semibold mr-1">
               {stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}%
             </span>
-            <span className="text-gray-400 ml-1">of total users</span>
+            <span>of total users</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-indigo-500 p-5 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-medium">Logged In Today</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.loggedInToday}</p>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Logged In Today</p>
+              <p className="text-2xl sm:text-3xl font-bold text-indigo-600 mt-1.5">{stats.loggedInToday}</p>
             </div>
-            <div className="p-3 bg-blue-50 rounded-xl">
-              <ArrowRightOnRectangleIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl">
+              <ArrowRightOnRectangleIcon className="w-6 h-6" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <CalendarIcon className="w-4 h-4 text-blue-500 mr-1" />
-            <span className="text-blue-500 font-medium">{stats.loggedInThisWeek}</span>
-            <span className="text-gray-400 ml-1">this week</span>
+          <div className="mt-4 flex items-center text-xs text-slate-500">
+            <CalendarIcon className="w-3.5 h-3.5 text-indigo-500 mr-1" />
+            <span className="font-semibold text-indigo-600 mr-1">{stats.loggedInThisWeek}</span>
+            <span>active this week</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-amber-500 p-5 hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-medium">Never Logged In</p>
-              <p className="text-2xl font-bold text-gray-600 mt-1">{stats.neverLoggedIn}</p>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Never Logged In</p>
+              <p className="text-2xl sm:text-3xl font-bold text-slate-700 mt-1.5">{stats.neverLoggedIn}</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-xl">
-              <ArrowLeftOnRectangleIcon className="w-6 h-6 text-gray-600" />
+            <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">
+              <ArrowLeftOnRectangleIcon className="w-6 h-6" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="text-gray-500 font-medium">
+          <div className="mt-4 flex items-center text-xs text-slate-500">
+            <span className="text-amber-600 font-semibold mr-1">
               {stats.total > 0 ? Math.round((stats.neverLoggedIn / stats.total) * 100) : 0}%
             </span>
-            <span className="text-gray-400 ml-1">of total users</span>
+            <span>dormant accounts</span>
           </div>
         </div>
       </div>
 
-      {/* Additional Stats - Second Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500">Admins</p>
-          <p className="text-2xl font-bold text-purple-600">{stats.admins}</p>
-          <p className="text-xs text-gray-400 mt-1">Administrators</p>
+      {/* Additional Stats - Second Row Chips */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 flex-shrink-0">
+            <ShieldCheckIcon className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-slate-400 font-medium">Admins</p>
+            <p className="text-lg font-bold text-slate-900">{stats.admins}</p>
+          </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500">Regular Users</p>
-          <p className="text-2xl font-bold text-green-600">{stats.users}</p>
-          <p className="text-xs text-gray-400 mt-1">Standard users</p>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 flex-shrink-0">
+            <UserIcon className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-slate-400 font-medium">Regular Users</p>
+            <p className="text-lg font-bold text-slate-900">{stats.users}</p>
+          </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500">Pending Approval</p>
-          <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-          <p className="text-xs text-gray-400 mt-1">Awaiting activation</p>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0">
+            <ClockIcon className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-slate-400 font-medium">Pending</p>
+            <p className="text-lg font-bold text-slate-900">{stats.pending}</p>
+          </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500">Recent Users</p>
-          <p className="text-2xl font-bold text-indigo-600">{stats.recentUsers}</p>
-          <p className="text-xs text-gray-400 mt-1">Joined in last 7 days</p>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
+            <CalendarIcon className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-slate-400 font-medium">New (7 Days)</p>
+            <p className="text-lg font-bold text-slate-900">{stats.recentUsers}</p>
+          </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 relative">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search users..."
+            placeholder="Search users by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200/80 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-sm transition-all"
           />
         </div>
         <div className="flex gap-2">
           <select
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="px-3.5 py-2.5 bg-white border border-slate-200/80 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-sm cursor-pointer"
           >
             <option value="all">All Roles</option>
             <option value="user">User</option>
@@ -433,7 +468,7 @@ const AdminUsers = () => {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="px-3.5 py-2.5 bg-white border border-slate-200/80 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-sm cursor-pointer"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -450,44 +485,52 @@ const AdminUsers = () => {
             filteredUsers.map((user) => {
               const statusBadge = getStatusBadge(user.status);
               const isCurrentUser = user.id === currentUser?.id;
+              const isAdmin = user.role === 'admin' || user.role === 'superadmin';
               
               return (
                 <div 
                   key={user.id} 
-                  className={`bg-white rounded-xl shadow-sm border-2 overflow-hidden hover:shadow-md transition-all hover:border-orange-300 group ${isCurrentUser ? 'border-blue-300' : 'border-gray-200'}`}
+                  className={`bg-white rounded-2xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col justify-between ${
+                    isCurrentUser ? 'border-emerald-400 ring-1 ring-emerald-400/30' : 'border-slate-200/80 hover:border-slate-300'
+                  }`}
                 >
-                  <div className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center space-x-3 min-w-0">
+                        <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold text-base shadow-sm flex-shrink-0 ${
+                          isAdmin 
+                            ? 'bg-gradient-to-tr from-purple-600 to-indigo-500' 
+                            : 'bg-gradient-to-tr from-emerald-500 to-teal-500'
+                        }`}>
                           {user.name?.charAt(0).toUpperCase() || 'U'}
                         </div>
-                        <div>
-                          <h3 className="font-bold text-gray-800">
-                            {user.name}
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-slate-900 truncate flex items-center gap-1.5">
+                            <span className="truncate">{user.name}</span>
                             {isCurrentUser && (
-                              <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                              <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-1.5 py-0.5 rounded-full font-medium flex-shrink-0">
                                 You
                               </span>
                             )}
                           </h3>
-                          <p className="text-sm text-gray-500 flex items-center">
-                            <EnvelopeIcon className="w-3 h-3 mr-1" />
-                            {user.email}
+                          <p className="text-xs text-slate-500 truncate flex items-center mt-0.5">
+                            <EnvelopeIcon className="w-3 h-3 mr-1 flex-shrink-0 text-slate-400" />
+                            <span className="truncate">{user.email}</span>
                           </p>
                         </div>
                       </div>
-                      <div className="flex gap-1">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         <button
                           onClick={() => handleViewUser(user)}
-                          className="p-1.5 bg-gray-100 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                          className="p-1.5 bg-slate-100/70 hover:bg-slate-200/70 text-slate-600 rounded-lg transition-colors"
                           title="View Details"
                         >
                           <MagnifyingGlassIcon className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleEdit(user)}
-                          className="p-1.5 bg-gray-100 rounded-lg text-orange-600 hover:bg-orange-50 transition-colors"
+                          className="p-1.5 bg-slate-100/70 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 rounded-lg transition-colors"
+                          title="Edit User"
                         >
                           <PencilIcon className="w-4 h-4" />
                         </button>
@@ -497,7 +540,8 @@ const AdminUsers = () => {
                               setUserToDelete(user);
                               setShowDeleteModal(true);
                             }}
-                            className="p-1.5 bg-gray-100 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                            className="p-1.5 bg-slate-100/70 hover:bg-rose-50 hover:text-rose-600 text-slate-600 rounded-lg transition-colors"
+                            title="Delete User"
                           >
                             <TrashIcon className="w-4 h-4" />
                           </button>
@@ -505,147 +549,151 @@ const AdminUsers = () => {
                       </div>
                     </div>
                     
-                    <div className="mt-4 space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500">Role</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold capitalize border ${getRoleBadge(user.role)}`}>
+                    <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400">Role</span>
+                        <span className={`px-2.5 py-0.5 rounded-full font-semibold capitalize border ${getRoleBadge(user.role)}`}>
                           {user.role}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500">Status</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold capitalize border flex items-center gap-1 ${statusBadge.color}`}>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400">Status</span>
+                        <span className={`px-2.5 py-0.5 rounded-full font-semibold capitalize border flex items-center gap-1 ${statusBadge.color}`}>
                           {statusBadge.icon}
                           {user.status}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500">Last Login</span>
-                        <span className="text-gray-700">{formatDate(user.last_login)}</span>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400">Last Active</span>
+                        <span className="text-slate-700 font-medium">{formatDate(user.last_login)}</span>
                       </div>
                       {user.phone && (
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-500">Phone</span>
-                          <span className="text-gray-700">{user.phone}</span>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-slate-400">Phone</span>
+                          <span className="text-slate-700 font-medium">{user.phone}</span>
                         </div>
                       )}
                     </div>
 
-                    <div className="mt-4 pt-3 border-t flex items-center justify-between">
-                      <span className="text-xs text-gray-400">
-                        Joined: {new Date(user.created_at).toLocaleDateString()}
-                      </span>
-                      <ArrowRightOnRectangleIcon className="w-4 h-4 text-gray-400 group-hover:text-orange-500 transition-colors" />
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                      <span>Joined {new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      <span className="text-slate-300">ID #{user.id}</span>
                     </div>
                   </div>
                 </div>
               );
             })
           ) : (
-            <div className="col-span-full text-center py-12">
-              <UserIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No users found</p>
+            <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
+              <UserIcon className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-700 font-semibold text-base">No users found</p>
+              <p className="text-slate-400 text-xs mt-1">Try adjusting your search or status filter</p>
             </div>
           )}
         </div>
       ) : (
         /* Table View - Shows ALL users */
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-slate-50/70 border-b border-slate-200/80">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     S.No
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Contact
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Last Login
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-slate-100">
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((user, index) => {
                     const statusBadge = getStatusBadge(user.status);
                     const isCurrentUser = user.id === currentUser?.id;
+                    const isAdmin = user.role === 'admin' || user.role === 'superadmin';
                     
                     return (
-                      <tr key={user.id} className={`hover:bg-gray-50 transition-colors ${isCurrentUser ? 'bg-blue-50' : ''}`}>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      <tr key={user.id} className={`hover:bg-slate-50/60 transition-colors ${isCurrentUser ? 'bg-emerald-50/20' : ''}`}>
+                        <td className="px-5 py-4 text-xs font-semibold text-slate-400">
                           {index + 1}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-5 py-4">
                           <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-sm flex-shrink-0 ${
+                              isAdmin ? 'bg-gradient-to-tr from-purple-600 to-indigo-500' : 'bg-gradient-to-tr from-emerald-500 to-teal-500'
+                            }`}>
                               {user.name?.charAt(0).toUpperCase() || 'U'}
                             </div>
                             <div>
-                              <div className="font-medium text-gray-900">
+                              <div className="font-semibold text-slate-900 text-sm flex items-center gap-1.5">
                                 {user.name}
                                 {isCurrentUser && (
-                                  <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                                  <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.2 rounded-full font-medium">
                                     You
                                   </span>
                                 )}
                               </div>
-                              <div className="text-sm text-gray-500 flex items-center">
-                                <EnvelopeIcon className="w-3 h-3 mr-1" />
+                              <div className="text-xs text-slate-400 flex items-center mt-0.5">
+                                <EnvelopeIcon className="w-3 h-3 mr-1 text-slate-400" />
                                 {user.email}
                               </div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-5 py-4">
                           {user.phone ? (
-                            <div className="text-sm text-gray-500 flex items-center">
-                              <PhoneIcon className="w-3 h-3 mr-1" />
+                            <div className="text-xs text-slate-600 flex items-center font-medium">
+                              <PhoneIcon className="w-3 h-3 mr-1 text-slate-400" />
                               {user.phone}
                             </div>
                           ) : (
-                            <span className="text-sm text-gray-400">Not provided</span>
+                            <span className="text-xs text-slate-400">None</span>
                           )}
                         </td>
-                        <td className="px-6 py-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize border ${getRoleBadge(user.role)}`}>
+                        <td className="px-5 py-4">
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize border ${getRoleBadge(user.role)}`}>
                             {user.role}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize border flex items-center gap-1 w-fit ${statusBadge.color}`}>
+                        <td className="px-5 py-4">
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize border flex items-center gap-1 w-fit ${statusBadge.color}`}>
                             {statusBadge.icon}
                             {user.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
+                        <td className="px-5 py-4 text-xs text-slate-500 font-medium">
                           {formatDate(user.last_login)}
                         </td>
-                        <td className="px-6 py-4 text-right space-x-2">
+                        <td className="px-5 py-4 text-right space-x-1.5">
                           <button
                             onClick={() => handleViewUser(user)}
-                            className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="View"
                           >
-                            <MagnifyingGlassIcon className="w-5 h-5" />
+                            <MagnifyingGlassIcon className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleEdit(user)}
-                            className="p-1 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                            title="Edit"
                           >
-                            <PencilIcon className="w-5 h-5" />
+                            <PencilIcon className="w-4 h-4" />
                           </button>
                           {!isCurrentUser && (
                             <button
@@ -653,9 +701,10 @@ const AdminUsers = () => {
                                 setUserToDelete(user);
                                 setShowDeleteModal(true);
                               }}
-                              className="p-1 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                              title="Delete"
                             >
-                              <TrashIcon className="w-5 h-5" />
+                              <TrashIcon className="w-4 h-4" />
                             </button>
                           )}
                         </td>
@@ -664,11 +713,8 @@ const AdminUsers = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan="7">
-                      <div className="text-center py-12">
-                        <UserIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-500">No users found</p>
-                      </div>
+                    <td colSpan="7" className="text-center py-12 text-slate-400 text-sm">
+                      No users match your filters
                     </td>
                   </tr>
                 )}

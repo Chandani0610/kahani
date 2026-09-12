@@ -9,30 +9,35 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
   ClockIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  Squares2X2Icon,
+  TableCellsIcon
 } from '@heroicons/react/24/outline';
 import { contactService } from '../../services/contactService';
 
-const StatCard = ({ title, count, icon: Icon, color, filter, description, onClick, isActive }) => (
-  <div 
+const StatCard = ({ title, count, icon: Icon, iconBg, iconColor, filter, description, onClick, isActive, accentBorder }) => (
+  <button 
+    type="button"
     onClick={() => onClick(filter)}
-    className={`bg-white rounded-xl shadow-sm border p-6 cursor-pointer transition-all hover:shadow-md ${
-      isActive ? 'ring-2 ring-green-500 border-green-500' : 'border-gray-100'
-    }`}
+    className={`w-full text-left bg-white rounded-2xl shadow-sm border p-5 cursor-pointer transition-all hover:shadow-md ${
+      isActive 
+        ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-md' 
+        : 'border-slate-200/80 hover:border-slate-300'
+    } ${accentBorder || ''}`}
   >
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-sm text-gray-500 font-medium">{title}</p>
-        <p className="text-2xl font-bold text-gray-800 mt-1">{count}</p>
+        <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{title}</p>
+        <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">{count}</p>
         {description && (
-          <p className="text-xs text-gray-400 mt-1">{description}</p>
+          <p className="text-xs text-slate-400 mt-1">{description}</p>
         )}
       </div>
-      <div className={`p-3 ${color} rounded-xl`}>
-        <Icon className="w-6 h-6 text-white" />
+      <div className={`p-3 ${iconBg || 'bg-slate-100'} ${iconColor || 'text-slate-600'} rounded-2xl`}>
+        <Icon className="w-6 h-6" />
       </div>
     </div>
-  </div>
+  </button>
 );
 
 const AdminContacts = () => {
@@ -237,70 +242,92 @@ const AdminContacts = () => {
       )}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Contacts</h1>
-          <p className="text-gray-500 mt-1">Manage contact inquiries</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Contact Messages</h1>
+          <p className="text-slate-500 mt-1 text-sm">Review visitor feedback, partnership requests, and support queries</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1.5 bg-slate-200/60 p-1 rounded-xl border border-slate-200/80 self-start sm:self-auto">
           <button 
-            onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
-            className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+            onClick={() => setViewMode('grid')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              viewMode === 'grid' 
+                ? 'bg-white text-slate-900 shadow-sm' 
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
           >
-            {viewMode === 'grid' ? 'Table View' : 'Grid View'}
+            <Squares2X2Icon className="w-4 h-4" />
+            Grid
+          </button>
+          <button 
+            onClick={() => setViewMode('table')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              viewMode === 'table' 
+                ? 'bg-white text-slate-900 shadow-sm' 
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <TableCellsIcon className="w-4 h-4" />
+            Table
           </button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
-          title="Total"
+          title="All Inquiries"
           count={stats.total}
           icon={EnvelopeIcon}
-          color="bg-blue-500"
+          iconBg="bg-blue-50"
+          iconColor="text-blue-600"
+          accentBorder="border-t-4 border-t-blue-500"
           filter="all"
-          description="All inquiries"
+          description="Total messages received"
           onClick={handleFilterClick}
           isActive={filterStatus === 'all'}
         />
         <StatCard
-          title="Pending"
+          title="Pending Attention"
           count={stats.pending}
           icon={ClockIcon}
-          color="bg-yellow-500"
+          iconBg="bg-amber-50"
+          iconColor="text-amber-600"
+          accentBorder="border-t-4 border-t-amber-500"
           filter="pending"
-          description="Need attention"
+          description="Awaiting admin response"
           onClick={handleFilterClick}
           isActive={filterStatus === 'pending'}
         />
         <StatCard
-          title="Replied"
+          title="Replied & Resolved"
           count={stats.replied}
           icon={CheckCircleIcon}
-          color="bg-green-500"
+          iconBg="bg-emerald-50"
+          iconColor="text-emerald-600"
+          accentBorder="border-t-4 border-t-emerald-500"
           filter="replied"
-          description="Resolved"
+          description="Completed inquiries"
           onClick={handleFilterClick}
           isActive={filterStatus === 'replied'}
         />
       </div>
 
-      {/* Search Bar - Moved below stats and made more compact */}
+      {/* Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3 items-center">
         <div className="flex-1 relative w-full">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             placeholder="Search contacts by name, email, or subject..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200/80 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-sm transition-all"
           />
         </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <span className="text-sm text-gray-500 whitespace-nowrap">
-            {filteredContacts.length} {filteredContacts.length === 1 ? 'contact' : 'contacts'}
+        <div className="flex items-center gap-2 w-full sm:w-auto text-xs font-medium text-slate-500">
+          <span className="px-3 py-1.5 bg-slate-100 rounded-lg text-slate-600">
+            {filteredContacts.length} {filteredContacts.length === 1 ? 'message' : 'messages'}
           </span>
         </div>
       </div>
@@ -308,73 +335,80 @@ const AdminContacts = () => {
       {/* Grid View */}
       {viewMode === 'grid' ? (
         filteredContacts.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
-            <EnvelopeIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">No contacts found</p>
+          <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-slate-200/80">
+            <EnvelopeIcon className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+            <p className="text-slate-700 font-semibold text-base">No contact messages found</p>
+            <p className="text-slate-400 text-xs mt-1">Try switching filter tabs or clearing your search term</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredContacts.map((contact) => (
               <div 
                 key={contact.id} 
-                className={`bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-all hover:border-green-300 group ${
-                  contact.status === 'pending' ? 'border-yellow-200 bg-yellow-50/30' : 'border-gray-200'
+                className={`bg-white rounded-2xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col justify-between group ${
+                  contact.status === 'pending' || !contact.replied 
+                    ? 'border-amber-200/80 hover:border-amber-300' 
+                    : 'border-slate-200/80 hover:border-slate-300'
                 }`}
               >
                 <div className="p-5">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-11 h-11 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <UserIcon className="w-5 h-5 text-green-600" />
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className="w-10 h-10 bg-gradient-to-tr from-amber-500 to-orange-500 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">
+                        {contact.name?.charAt(0).toUpperCase() || 'V'}
                       </div>
-                      <div>
-                        <h3 className="font-bold text-gray-800 text-sm">{contact.name}</h3>
-                        <p className="text-xs text-gray-500">{contact.email}</p>
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-slate-900 text-sm truncate">{contact.name}</h3>
+                        <p className="text-xs text-slate-400 truncate">{contact.email}</p>
                       </div>
                     </div>
-                    <div className="flex gap-1">
+                    <div className="flex items-center gap-1 flex-shrink-0">
                       <button
                         onClick={() => handleViewContact(contact)}
-                        className="p-1.5 bg-gray-100 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                        className="p-1.5 bg-slate-100/70 hover:bg-blue-50 hover:text-blue-600 rounded-lg text-slate-500 transition-colors"
                         title="View Details"
                       >
-                        <EyeIcon className="w-3.5 h-3.5" />
+                        <EyeIcon className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => {
                           setContactToDelete(contact);
                           setShowDeleteModal(true);
                         }}
-                        className="p-1.5 bg-gray-100 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                        className="p-1.5 bg-slate-100/70 hover:bg-rose-50 hover:text-rose-600 rounded-lg text-slate-500 transition-colors"
                         title="Delete Contact"
                       >
-                        <TrashIcon className="w-3.5 h-3.5" />
+                        <TrashIcon className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                   
-                  <div className="mt-3 space-y-1.5">
+                  <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-500">Subject</span>
-                      <span className="text-gray-700 font-medium truncate max-w-[150px]">
+                      <span className="text-slate-400">Subject</span>
+                      <span className="text-slate-800 font-medium truncate max-w-[170px]">
                         {contact.subject || 'No subject'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-500">Status</span>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        contact.replied ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                      <span className="text-slate-400">Status</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize border ${
+                        contact.replied 
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80' 
+                          : 'bg-amber-50 text-amber-700 border-amber-200/80'
                       }`}>
                         {contact.replied ? '✓ Replied' : 'Pending'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-500">Received</span>
-                      <span className="text-gray-700">{new Date(contact.created_at).toLocaleDateString()}</span>
+                      <span className="text-slate-400">Received</span>
+                      <span className="text-slate-600 font-medium">{new Date(contact.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     </div>
                     {contact.message && (
-                      <div className="mt-2 pt-2 border-t border-gray-100">
-                        <p className="text-xs text-gray-600 line-clamp-2">{contact.message}</p>
+                      <div className="mt-2.5 pt-2.5 border-t border-slate-100">
+                        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed bg-slate-50/60 p-2.5 rounded-xl border border-slate-100">
+                          {contact.message}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -385,48 +419,49 @@ const AdminContacts = () => {
         )
       ) : (
         /* Table View */
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-slate-50/70 border-b border-slate-200/80">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">S.No</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">S.No</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Contact</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Subject</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
+                  <th className="px-5 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-slate-100">
                 {filteredContacts.map((contact, index) => (
-                  <tr key={contact.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{index + 1}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-7 h-7 bg-green-100 rounded-full flex items-center justify-center">
-                          <UserIcon className="w-3.5 h-3.5 text-green-600" />
+                  <tr key={contact.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="px-5 py-4 text-xs font-semibold text-slate-400">{index + 1}</td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center space-x-2.5">
+                        <div className="w-8 h-8 bg-gradient-to-tr from-amber-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                          {contact.name?.charAt(0).toUpperCase() || 'V'}
                         </div>
-                        <span className="text-sm font-medium text-gray-900">{contact.name}</span>
+                        <span className="text-sm font-semibold text-slate-900">{contact.name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{contact.email}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{contact.subject || 'No subject'}</td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                        contact.replied ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                    <td className="px-5 py-4 text-xs text-slate-500 font-medium">{contact.email}</td>
+                    <td className="px-5 py-4 text-xs text-slate-700 font-medium">{contact.subject || 'No subject'}</td>
+                    <td className="px-5 py-4">
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize border ${
+                        contact.replied ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80' : 'bg-amber-50 text-amber-700 border-amber-200/80'
                       }`}>
                         {contact.replied ? '✓ Replied' : 'Pending'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
-                      {new Date(contact.created_at).toLocaleDateString()}
+                    <td className="px-5 py-4 text-xs text-slate-500 font-medium">
+                      {new Date(contact.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>
-                    <td className="px-4 py-3 text-right space-x-1">
+                    <td className="px-5 py-4 text-right space-x-1.5">
                       <button 
                         onClick={() => handleViewContact(contact)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View"
                       >
                         <EyeIcon className="w-4 h-4" />
                       </button>
@@ -435,7 +470,8 @@ const AdminContacts = () => {
                           setContactToDelete(contact);
                           setShowDeleteModal(true);
                         }}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                        title="Delete"
                       >
                         <TrashIcon className="w-4 h-4" />
                       </button>
@@ -446,9 +482,9 @@ const AdminContacts = () => {
             </table>
           </div>
           {filteredContacts.length === 0 && (
-            <div className="text-center py-12">
-              <EnvelopeIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No contacts found</p>
+            <div className="text-center py-16">
+              <EnvelopeIcon className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-500 text-sm">No contacts found matching your criteria</p>
             </div>
           )}
         </div>

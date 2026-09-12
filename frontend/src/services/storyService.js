@@ -2107,6 +2107,17 @@ export const storyService = {
 
         return "";
     },
+
+    // ===================================================
+    // ALIASES FOR COMPATIBILITY
+    // ===================================================
+    getStories: async (params) => {
+        return storyService.getAll();
+    },
+
+    getStoryById: async (id) => {
+        return storyService.getById(id);
+    },
 };
 
 // =====================================================

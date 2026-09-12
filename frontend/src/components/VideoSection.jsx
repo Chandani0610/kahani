@@ -592,15 +592,13 @@ const VideoSection = ({
                           delay:
                             index * 0.02,
                         }}
-                        className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-200 hover:-translate-y-1 cursor-pointer border border-white/20"
+                        className="group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer border-2 border-purple-200/80 hover:border-purple-400 flex flex-col relative"
                         onClick={() =>
                           setModal(videoId)
                         }
                       >
-
                         {/* Thumbnail */}
-                        <div className="relative aspect-video overflow-hidden bg-gray-100">
-
+                        <div className="relative aspect-video overflow-hidden bg-slate-950">
                           <img
                             src={getThumbnail(
                               videoId
@@ -609,7 +607,7 @@ const VideoSection = ({
                               video.title ||
                               "Video"
                             }
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
                             loading={
                               index < 4
                                 ? "eager"
@@ -621,50 +619,69 @@ const VideoSection = ({
                                 ? "high"
                                 : "auto"
                             }
+                            onError={(e) => {
+                              e.currentTarget.src =
+                                "/images/video-placeholder.jpg";
+                            }}
                           />
 
-                          {/* Play */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center">
-
-                            <div className="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center shadow-xl">
-
-                              <FaPlay className="text-gray-900 text-xl ml-1" />
-
+                          {/* Center Play Button Overlay */}
+                          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/35 transition-colors duration-200 flex items-center justify-center">
+                            <div className="w-12 h-12 rounded-full bg-red-600/90 group-hover:bg-red-600 text-white flex items-center justify-center shadow-xl group-hover:scale-115 transition-all duration-300 border-2 border-white/90">
+                              <FaPlay className="text-white text-sm ml-0.5" />
                             </div>
-
                           </div>
 
-                          {/* Duration */}
-                          {video.duration && (
-                            <div className="absolute bottom-3 right-3 bg-black/80 text-white text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
+                          {/* Category Badge on Top Left */}
+                          <div className="absolute top-3 left-3 z-10">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[11px] font-black text-purple-900 shadow-sm border border-purple-100">
+                              <span>🎬</span>
+                              <span>{video.category || "Animated Tale"}</span>
+                            </span>
+                          </div>
 
-                              <FaClock className="text-yellow-400 text-[10px]" />
-
-                              {video.duration}
-
+                          {/* Duration Badge on Bottom Right */}
+                          {video.duration ? (
+                            <div className="absolute bottom-2.5 right-2.5 z-10">
+                              <span className="inline-flex items-center gap-1 bg-black/75 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-lg border border-white/20 shadow-xs">
+                                <FaClock className="text-yellow-400 text-[10px]" />
+                                <span>{video.duration}</span>
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="absolute bottom-2.5 right-2.5 z-10">
+                              <span className="inline-flex items-center gap-1 bg-red-600/90 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                                <span>HD Video</span>
+                              </span>
                             </div>
                           )}
-
                         </div>
 
-                        {/* Grid Title */}
-                        <div className="p-4">
+                        {/* Card Content */}
+                        <div className="p-5 flex-1 flex flex-col justify-between bg-gradient-to-b from-white to-purple-50/25">
+                          <div>
+                            <h3 className="text-purple-950 font-black text-base sm:text-lg line-clamp-1 group-hover:text-pink-600 transition-colors leading-snug">
+                              {video.title || "Untitled Video"}
+                            </h3>
 
-                          <h3 className="text-gray-800 font-bold text-base line-clamp-2 group-hover:text-yellow-600 transition-colors">
+                            <p className="text-slate-500 text-xs sm:text-sm mt-1.5 line-clamp-2 leading-relaxed font-medium">
+                              {video.description ||
+                                "Watch this wonderful animated story on KahaniLand!"}
+                            </p>
+                          </div>
 
-                            {video.title ||
-                              "Untitled Video"}
-
-                          </h3>
-
-                          {video.category && (
-                            <span className="inline-block mt-2 px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full">
-                              {video.category}
+                          {/* Bottom Action Row */}
+                          <div className="mt-4 pt-3 border-t border-purple-100 flex items-center justify-between gap-2">
+                            <span className="text-xs font-bold text-purple-800 bg-purple-100/80 px-2.5 py-1 rounded-lg">
+                              🎈 {video.age_group || "Kids & Family"}
                             </span>
-                          )}
 
+                            <div className="px-3.5 py-1.5 bg-gradient-to-r from-red-500 to-pink-500 group-hover:from-red-600 group-hover:to-pink-600 text-white font-black text-xs rounded-xl shadow-xs group-hover:shadow transition-all flex items-center gap-1.5 border-b border-red-700">
+                              <span>Watch</span>
+                              <span className="group-hover:scale-110 transition-transform">🍿▶</span>
+                            </div>
+                          </div>
                         </div>
-
                       </motion.div>
                     );
                   }

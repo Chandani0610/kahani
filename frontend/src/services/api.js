@@ -84,6 +84,25 @@ api.interceptors.request.use(
 );
 
 // ======================================
+// Auto-detect Active Backend Port Fallback
+// ======================================
+
+let activePortPromise = null;
+
+async function findActiveApiBaseUrl() {
+    const candidatePorts = [5000, 5001, 5002, 5003, 5004, 5005];
+    for (const port of candidatePorts) {
+        try {
+            const res = await axios.get(`http://localhost:${port}/api/health`, { timeout: 1200 });
+            if (res.status === 200) {
+                return `http://localhost:${port}/api`;
+            }
+        } catch (_) {}
+    }
+    return null;
+}
+
+// ======================================
 // Response Interceptor
 // ======================================
 
@@ -92,7 +111,31 @@ api.interceptors.response.use(
         return response;
     },
 
-    (error) => {
+    async (error) => {
+        const originalRequest = error.config;
+
+        // If network connection failed, probe fallback ports
+        if (
+            originalRequest &&
+            !originalRequest._retriedPort &&
+            (error.code === "ERR_NETWORK" || !error.response || error.code === "ECONNREFUSED")
+        ) {
+            originalRequest._retriedPort = true;
+            if (!activePortPromise) {
+                activePortPromise = findActiveApiBaseUrl().finally(() => {
+                    activePortPromise = null;
+                });
+            }
+
+            const liveBase = await activePortPromise;
+            if (liveBase && liveBase !== api.defaults.baseURL) {
+                console.info(`🔄 Auto-switching API baseURL to active server: ${liveBase}`);
+                api.defaults.baseURL = liveBase;
+                originalRequest.baseURL = liveBase;
+                return api(originalRequest);
+            }
+        }
+
         const status = error.response?.status;
 
         if (status === 401) {

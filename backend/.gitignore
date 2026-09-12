@@ -37,3 +37,6 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+
+# Port tracking
+.active_port

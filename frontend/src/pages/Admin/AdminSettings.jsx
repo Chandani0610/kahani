@@ -1,43 +1,24 @@
-import { useState} from 'react';
-
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 import {
-
   UserIcon,
-
-
-
-  
-
   BellIcon,
-
-  
-
   ShieldCheckIcon,
-
-
-
   PaintBrushIcon,
-
   LanguageIcon,
-
   ArrowLeftIcon,
-
   CheckCircleIcon,
-
   ExclamationCircleIcon,
-
   XMarkIcon,
-
   PencilIcon,
-
   EyeIcon,
-
   EyeSlashIcon,
-
   KeyIcon,
-
+  CameraIcon,
+  ArrowUpTrayIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 
 
@@ -56,21 +37,36 @@ const AdminSettings = () => {
 
 
 
+  const { user, refreshUserData } = useAuth();
+  const fileInputRef = useRef(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
   // Profile Settings
-
   const [profileData, setProfileData] = useState({
-
-    name: 'Admin User',
-
-    email: 'admin@kahaniland.com',
-
-    role: 'Super Admin',
-
+    name: user?.name || 'Admin User',
+    email: user?.email || 'admin@kahaniland.com',
+    role: user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'admin' ? 'Admin' : 'Administrator',
     bio: 'Managing KahaniLand stories and content',
-
-    avatar: '',
-
+    avatar: user?.profile_image || localStorage.getItem('admin_avatar') || '',
   });
+
+  // Sync profile data when auth user changes
+  useEffect(() => {
+    if (user) {
+      setProfileData((prev) => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        role: user.role === 'superadmin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : prev.role,
+        avatar: user.profile_image || localStorage.getItem('admin_avatar') || prev.avatar,
+      }));
+    } else {
+      const saved = localStorage.getItem('admin_avatar');
+      if (saved) {
+        setProfileData((prev) => ({ ...prev, avatar: saved }));
+      }
+    }
+  }, [user]);
 
 
 
@@ -156,8 +152,79 @@ const AdminSettings = () => {
 
 
 
-  // Handle profile update
+  // Handle photo upload
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
+    if (!file.type.startsWith('image/')) {
+      showNotification('error', 'Please select a valid image file (PNG, JPG, JPEG, WEBP)');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification('error', 'Image size must be less than 5MB');
+      return;
+    }
+
+    setUploadingPhoto(true);
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64Data = reader.result;
+
+        // Instant local persistence
+        localStorage.setItem('admin_avatar', base64Data);
+        setProfileData((prev) => ({ ...prev, avatar: base64Data }));
+        setEditProfileData((prev) => ({ ...prev, avatar: base64Data }));
+
+        // Save to backend database
+        try {
+          await api.put('/auth/profile', {
+            name: profileData.name,
+            profile_image: base64Data,
+          });
+          if (refreshUserData) await refreshUserData();
+        } catch (apiErr) {
+          console.warn('Backend profile update note:', apiErr.message);
+        }
+
+        showNotification('success', 'Profile photo updated successfully!');
+        setUploadingPhoto(false);
+      };
+
+      reader.onerror = () => {
+        showNotification('error', 'Failed to read the selected photo');
+        setUploadingPhoto(false);
+      };
+
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error(err);
+      showNotification('error', 'Failed to upload photo');
+      setUploadingPhoto(false);
+    }
+  };
+
+  // Handle photo removal
+  const handleRemovePhoto = async () => {
+    localStorage.removeItem('admin_avatar');
+    setProfileData((prev) => ({ ...prev, avatar: '' }));
+    setEditProfileData((prev) => ({ ...prev, avatar: '' }));
+
+    try {
+      await api.put('/auth/profile', {
+        name: profileData.name,
+        profile_image: null,
+      });
+      if (refreshUserData) await refreshUserData();
+    } catch (_) {}
+
+    showNotification('success', 'Profile photo removed');
+  };
+
+  // Handle profile update
   const handleProfileUpdate = async (e) => {
 
     e.preventDefault();
@@ -506,24 +573,79 @@ const AdminSettings = () => {
 
 
 
-            <div className="flex items-center gap-6 mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8 p-5 bg-slate-50/80 rounded-2xl border border-slate-200/80">
+              {/* Avatar Image / Initial with Camera Badge */}
+              <div className="relative group flex-shrink-0">
+                {profileData.avatar ? (
+                  <img
+                    src={profileData.avatar}
+                    alt={profileData.name}
+                    className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md shadow-emerald-600/10"
+                  />
+                ) : (
+                  <div className="w-24 h-24 bg-gradient-to-tr from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-md border-4 border-white">
+                    {profileData.name.charAt(0)}
+                  </div>
+                )}
 
-              <div className="w-24 h-24 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center text-3xl font-bold text-white">
-
-                {profileData.name.charAt(0)}
-
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingPhoto}
+                  className="absolute bottom-0 right-0 p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-md border-2 border-white transition-transform hover:scale-110 focus:outline-none"
+                  title="Upload a photo"
+                >
+                  <CameraIcon className="w-4 h-4" />
+                </button>
               </div>
 
-              <div>
+              {/* Profile Details & Upload Action Buttons */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-xl font-bold text-gray-800 truncate">{profileData.name}</h3>
+                  <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-full capitalize">
+                    {profileData.role}
+                  </span>
+                </div>
+                <p className="text-gray-500 text-sm mb-3.5 truncate">{profileData.email}</p>
 
-                <h3 className="text-xl font-bold text-gray-800">{profileData.name}</h3>
+                {/* Upload Action Group */}
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handlePhotoUpload}
+                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                    className="hidden"
+                  />
 
-                <p className="text-gray-500">{profileData.role}</p>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingPhoto}
+                    className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    <ArrowUpTrayIcon className="w-3.5 h-3.5" />
+                    <span>{uploadingPhoto ? 'Uploading...' : 'Upload a photo'}</span>
+                  </button>
 
-                <p className="text-gray-400 text-sm">{profileData.email}</p>
+                  {profileData.avatar && (
+                    <button
+                      type="button"
+                      onClick={handleRemovePhoto}
+                      disabled={uploadingPhoto}
+                      className="px-3 py-1.5 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold rounded-xl transition flex items-center gap-1.5"
+                    >
+                      <TrashIcon className="w-3.5 h-3.5" />
+                      <span>Remove</span>
+                    </button>
+                  )}
 
+                  <span className="text-[11px] text-gray-400">
+                    JPG, PNG, GIF or WEBP (Max 5MB)
+                  </span>
+                </div>
               </div>
-
             </div>
 
 

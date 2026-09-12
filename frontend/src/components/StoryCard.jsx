@@ -322,6 +322,7 @@ const StoryCard = ({
               story-image
               w-full
               object-cover
+              object-top
               rounded-t-2xl
               pointer-events-none
             "

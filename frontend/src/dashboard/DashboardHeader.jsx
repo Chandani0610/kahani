@@ -1,5 +1,4 @@
-// src/components/dashboard/DashboardHeader.jsx
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   BookOpenIcon,
   VideoCameraIcon,
@@ -13,6 +12,7 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const calendarRef = useRef(null);
 
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
@@ -39,6 +39,27 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
     setSelectedDate(newDate);
     setShowCalendar(false);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+        setShowCalendar(false);
+      }
+    };
+    if (showCalendar) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showCalendar]);
+
+  useEffect(() => {
+    if (!showCalendar) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setShowCalendar(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCalendar]);
 
   const isToday = (day) => {
     const today = new Date();
@@ -109,34 +130,55 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
           </p>
         </div>
 
-        <div className="relative">
+        <div className="relative z-30" ref={calendarRef}>
           <button
-            onClick={() => setShowCalendar(!showCalendar)}
-            className="flex items-center gap-3 bg-white border rounded-xl px-5 py-3 shadow-sm hover:shadow-md transition-all duration-300 hover:border-green-400"
+            type="button"
+            onClick={() => setShowCalendar((prev) => !prev)}
+            className={`flex items-center gap-3 bg-white border rounded-xl px-5 py-3 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer ${
+              showCalendar ? 'border-green-500 ring-2 ring-green-100 shadow-md' : 'hover:border-green-400'
+            }`}
+            aria-label="Select date"
+            aria-expanded={showCalendar}
           >
             <CalendarDaysIcon className="w-6 h-6 text-gray-600" />
             <span className="font-semibold text-gray-700">
               {selectedDate.toLocaleDateString('en-US', {
-                month: 'long',
+                month: 'short',
                 day: 'numeric',
                 year: 'numeric',
-                weekday: 'long',
+                weekday: 'short',
               })}
             </span>
           </button>
 
+          {/* Calendar Popover */}
           {showCalendar && (
-            <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-xl border p-4 z-50 w-80">
+            <div
+              role="dialog"
+              aria-modal="false"
+              aria-label="Choose date"
+              className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 z-50 w-80 max-w-[calc(100vw-2rem)] animate-in fade-in zoom-in-95 duration-150 ring-1 ring-slate-900/10 origin-top-right"
+            >
               <div className="flex justify-between items-center mb-4">
-                <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <button
+                  type="button"
+                  onClick={prevMonth}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-slate-600"
+                  aria-label="Previous month"
+                >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
-                <h3 className="text-lg font-bold text-gray-800">
+                <h3 className="text-base font-bold text-gray-800">
                   {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
                 </h3>
-                <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <button
+                  type="button"
+                  onClick={nextMonth}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-slate-600"
+                  aria-label="Next month"
+                >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
@@ -161,14 +203,15 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
                   const isSelectedDate = isSelected(day);
                   return (
                     <button
+                      type="button"
                       key={day}
                       onClick={() => selectDate(day)}
                       className={`
-                        h-10 rounded-lg text-sm font-medium transition-all duration-200
+                        h-10 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center
                         ${isSelectedDate 
-                          ? 'bg-green-500 text-white hover:bg-green-600' 
+                          ? 'bg-green-500 text-white hover:bg-green-600 shadow-sm font-bold ring-2 ring-green-300' 
                           : isTodayDate 
-                            ? 'bg-green-50 text-green-600 border-2 border-green-400 hover:bg-green-100' 
+                            ? 'bg-green-50 text-green-600 border-2 border-green-400 hover:bg-green-100 font-bold' 
                             : 'hover:bg-gray-100 text-gray-700'
                         }
                       `}
@@ -181,6 +224,7 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
 
               <div className="mt-4 pt-4 border-t flex gap-2">
                 <button
+                  type="button"
                   onClick={() => {
                     const today = new Date();
                     setSelectedDate(today);
@@ -192,6 +236,7 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
                   Today
                 </button>
                 <button
+                  type="button"
                   onClick={() => {
                     const yesterday = new Date();
                     yesterday.setDate(yesterday.getDate() - 1);
@@ -203,14 +248,14 @@ const DashboardHeader = ({ stats, subscribersToday }) => {
                 >
                   Yesterday
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCalendar(false)}
+                  className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                >
+                  Close
+                </button>
               </div>
-
-              <button
-                onClick={() => setShowCalendar(false)}
-                className="mt-3 w-full px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-lg transition-colors"
-              >
-                Close
-              </button>
             </div>
           )}
         </div>

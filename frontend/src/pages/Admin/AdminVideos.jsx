@@ -11,6 +11,8 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
   ArrowRightIcon,
+  Squares2X2Icon,
+  TableCellsIcon
 } from '@heroicons/react/24/outline';
 import { videoService } from '../../services/videoService';
 import { useNavigate } from 'react-router-dom';
@@ -305,23 +307,41 @@ const AdminVideos = () => {
       )}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Videos</h1>
-          <p className="text-gray-500 mt-1">Manage your video collection</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Video Theater</h1>
+          <p className="text-slate-500 mt-1 text-sm">Manage animated video lessons, nursery rhymes, and multimedia</p>
         </div>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
-            className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            {viewMode === 'grid' ? 'Table View' : 'Grid View'}
-          </button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 bg-slate-200/60 p-1 rounded-xl border border-slate-200/80">
+            <button 
+              onClick={() => setViewMode('grid')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === 'grid' 
+                  ? 'bg-white text-slate-900 shadow-sm' 
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Squares2X2Icon className="w-4 h-4" />
+              Grid
+            </button>
+            <button 
+              onClick={() => setViewMode('table')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === 'table' 
+                  ? 'bg-white text-slate-900 shadow-sm' 
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <TableCellsIcon className="w-4 h-4" />
+              Table
+            </button>
+          </div>
           <button 
             onClick={handleAddVideo}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center space-x-2"
+            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl transition-all flex items-center space-x-2 text-xs font-semibold shadow-sm hover:shadow"
           >
-            <PlusIcon className="w-5 h-5" />
+            <PlusIcon className="w-4 h-4" />
             <span>Add New Video</span>
           </button>
         </div>
@@ -329,46 +349,50 @@ const AdminVideos = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500">Total Videos</p>
-          <p className="text-2xl font-bold text-gray-800">{videos.length}</p>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-purple-500 p-5 hover:shadow-md transition-all">
+          <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Videos</p>
+          <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">{videos.length}</p>
+          <p className="text-xs text-slate-400 mt-1">Published library</p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500">Categories</p>
-          <p className="text-2xl font-bold text-orange-600">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-indigo-500 p-5 hover:shadow-md transition-all">
+          <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Categories</p>
+          <p className="text-2xl sm:text-3xl font-bold text-indigo-600 mt-1">
             {new Set(videos.map(v => v.category).filter(Boolean)).size}
           </p>
+          <p className="text-xs text-slate-400 mt-1">Unique genres</p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500">Age Groups</p>
-          <p className="text-2xl font-bold text-purple-600">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-blue-500 p-5 hover:shadow-md transition-all">
+          <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Age Groups</p>
+          <p className="text-2xl sm:text-3xl font-bold text-blue-600 mt-1">
             {new Set(videos.map(v => v.age_group).filter(Boolean)).size}
           </p>
+          <p className="text-xs text-slate-400 mt-1">Target tiers</p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500">Total Views</p>
-          <p className="text-2xl font-bold text-blue-600">
-            {videos.reduce((sum, v) => sum + (v.views || 0), 0)}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-emerald-500 p-5 hover:shadow-md transition-all">
+          <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Views</p>
+          <p className="text-2xl sm:text-3xl font-bold text-emerald-600 mt-1">
+            {videos.reduce((sum, v) => sum + (v.views || 0), 0).toLocaleString()}
           </p>
+          <p className="text-xs text-slate-400 mt-1">Audience impressions</p>
         </div>
       </div>
 
       {/* Search and Filter */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 relative">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search videos..."
+            placeholder="Search videos by title..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200/80 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-sm transition-all"
           />
         </div>
         <select
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="px-3.5 py-2.5 bg-white border border-slate-200/80 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-sm cursor-pointer"
         >
           <option value="all">All Categories</option>
           {videoCategories.map(cat => (

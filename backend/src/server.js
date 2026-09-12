@@ -1,95 +1,98 @@
-// // require("dotenv").config();
-// // const app = require("./app");
-// // require("./config/db");
-
-// // const PORT = process.env.PORT || 5000;
-
-// // const server = app.listen(PORT, () => {
-// //     console.log(`🚀 Server Running on Port ${PORT}`);
-// //     console.log(`📚 API available at http://localhost:${PORT}/api/videos/`);
-// // });
-
-// // // Handle shutdown gracefully
-// // process.on("SIGTERM", () => {
-// //     console.log("SIGTERM signal received: closing HTTP server");
-// //     server.close(() => {
-// //         console.log("HTTP server closed");
-// //         process.exit(0);
-// //     });
-// // });
-// require("dotenv").config();
-
-// const app = require("./app");
-// require("./config/db");
-
-// const PORT = process.env.PORT || 5000;
-
-// const server = app.listen(PORT, () => {
-//     console.log("========================================");
-//     console.log(`🚀 Server running on http://localhost:${PORT}`);
-//     console.log(`📚 Stories API     : http://localhost:${PORT}/api/stories`);
-//     console.log(`🎥 Videos API      : http://localhost:${PORT}/api/videos`);
-//     console.log(`📧 Newsletter API  : http://localhost:${PORT}/api/newsletters`);
-//     console.log(`📞 Contact API     : http://localhost:${PORT}/api/contacts`);
-//     console.log(`❤️ Health Check    : http://localhost:${PORT}/api/health`);
-//     console.log("========================================");
-// });
-
-// server.on("error", (err) => {
-//     console.error("Server Error:", err);
-// });
-
-// process.on("SIGINT", () => {
-//     console.log("\nStopping server...");
-//     server.close(() => {
-//         console.log("Server stopped.");
-//         process.exit(0);
-//     });
-// });
-
-// process.on("SIGTERM", () => {
-//     console.log("SIGTERM received.");
-//     server.close(() => {
-//         console.log("Server stopped.");
-//         process.exit(0);
-//     });
-// });
-
-
-
-
 require("dotenv").config();
-
+const fs = require("fs");
+const path = require("path");
+const http = require("http");
 const app = require("./app");
 require("./config/db");
 
-const PORT = process.env.PORT || 5000;
+// Configure ports to try
+const primaryPort = parseInt(process.env.PORT, 10) || 5000;
+const configuredPorts = process.env.PORTS
+  ? process.env.PORTS.split(",").map((p) => parseInt(p.trim(), 10)).filter(Boolean)
+  : [];
 
-const server = app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+// Build ordered list of candidate ports (starting with primary, then up to 10 sequential fallbacks)
+const candidatePorts = Array.from(
+  new Set([
+    primaryPort,
+    ...configuredPorts,
+    5000,
+    5001,
+    5002,
+    5003,
+    5004,
+    5005,
+    5006,
+    5007,
+    5008,
+    5009,
+  ])
+);
 
-server.on("error", (err) => {
+let activeServer = null;
+
+const startServer = (portIndex = 0) => {
+  if (portIndex >= candidatePorts.length) {
+    console.error(
+      "\n❌ All candidate ports are currently in use! Tried:",
+      candidatePorts.join(", ")
+    );
+    console.error("👉 Please free a port or set a custom PORT in .env\n");
+    process.exit(1);
+  }
+
+  const currentPort = candidatePorts[portIndex];
+  const server = http.createServer(app);
+
+  server.listen(currentPort, () => {
+    activeServer = server;
+    console.log("========================================");
+    console.log(`🚀 KahaniLand Server Running on http://localhost:${currentPort}`);
+    console.log(`📚 Stories API     : http://localhost:${currentPort}/api/stories`);
+    console.log(`🎥 Videos API      : http://localhost:${currentPort}/api/videos`);
+    console.log(`📧 Newsletter API  : http://localhost:${currentPort}/api/newsletters`);
+    console.log(`📞 Contact API     : http://localhost:${currentPort}/api/contacts`);
+    console.log(`❤️ Health Check    : http://localhost:${currentPort}/api/health`);
+    console.log("========================================");
+
+    // Save active port for local discovery
+    try {
+      fs.writeFileSync(path.join(__dirname, "../.active_port"), String(currentPort));
+      const fePortPath = path.resolve(__dirname, "../../frontend/.active_port");
+      fs.writeFileSync(fePortPath, String(currentPort));
+    } catch (_) {}
+  });
+
+  server.on("error", (err) => {
     if (err.code === "EADDRINUSE") {
-        console.error(`\n❌ Server Error: Port ${PORT} is already in use!`);
-        console.error(`👉 Stop the process using port ${PORT} or change PORT in .env\n`);
-        process.exit(1);
+      console.warn(`⚠️ Port ${currentPort} is in use. Trying fallback port ${candidatePorts[portIndex + 1]}...`);
+      server.close();
+      startServer(portIndex + 1);
+    } else {
+      console.error("Server Error:", err);
+      process.exit(1);
     }
-    console.error("Server Error:", err);
-});
+  });
+};
 
-process.on("SIGINT", () => {
-    console.log("\nStopping server...");
-    server.close(() => {
-        console.log("Server stopped.");
-        process.exit(0);
-    });
-});
+startServer(0);
 
-process.on("SIGTERM", () => {
-    console.log("SIGTERM received.");
-    server.close(() => {
-        console.log("Server stopped.");
-        process.exit(0);
+// Graceful shutdown handling
+const shutdown = () => {
+  console.log("\nStopping KahaniLand server...");
+  if (activeServer) {
+    activeServer.close(() => {
+      console.log("Server stopped successfully.");
+      try {
+        const portFile = path.join(__dirname, "../.active_port");
+        if (fs.existsSync(portFile)) fs.unlinkSync(portFile);
+      } catch (_) {}
+      process.exit(0);
     });
-});
+  } else {
+    process.exit(0);
+  }
+};
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

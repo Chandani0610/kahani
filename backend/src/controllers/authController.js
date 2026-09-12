@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 const UserModel = require('../models/User');
-const { generateToken } = require('../utils/jwt');
+const { generateToken, generateResetToken, verifyResetToken } = require('../utils/jwt');
 const AppError = require('../utils/AppError');
 
 // ============================================
@@ -88,7 +88,7 @@ const register = async (req, res, next) => {
 // ============================================
 const login = async (req, res, next) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, portal } = req.body;
 
         // ✅ Validation
         if (!email || !password) {
@@ -111,6 +111,13 @@ const login = async (req, res, next) => {
         if (!isPasswordValid) {
             return next(new AppError('Invalid email or password', 401));
         }
+
+        // ✅ Role Separation Check
+        if (portal === 'admin' && user.role !== 'admin' && user.role !== 'superadmin') {
+            return next(new AppError('Access denied: Only administrators can log in through the Admin Portal.', 403));
+        }
+
+        // Note: Admin accounts ARE allowed to log into User Portal -> 200 OK (Allowed)
 
         // ✅ Generate token
         const token = generateToken(user.id, user.email, user.role);
@@ -162,7 +169,7 @@ const getProfile = async (req, res, next) => {
 // ============================================
 const updateProfile = async (req, res, next) => {
     try {
-        const { name, phone } = req.body;
+        const { name, phone, profile_image } = req.body;
         const userId = req.userId;
 
         // ✅ Validation
@@ -184,6 +191,10 @@ const updateProfile = async (req, res, next) => {
             role: user.role,
             status: user.status
         };
+
+        if (profile_image !== undefined) {
+            updateData.profile_image = profile_image;
+        }
 
         // ✅ Update user
         const updated = await UserModel.update(userId, updateData);
@@ -280,7 +291,7 @@ const logout = async (req, res, next) => {
 };
 
 // ============================================
-// FORGOT PASSWORD - Send reset link
+// FORGOT PASSWORD - Send reset link & token
 // ============================================
 const forgotPassword = async (req, res, next) => {
     try {
@@ -293,21 +304,36 @@ const forgotPassword = async (req, res, next) => {
         // ✅ Find user
         const user = await UserModel.findByEmail(email.toLowerCase().trim());
         if (!user) {
-            return next(new AppError('User not found with this email', 404));
+            return next(new AppError('No account found with this email address', 404));
         }
 
-        // ✅ Generate reset token (implementation depends on your setup)
-        // const resetToken = generateResetToken(user.id);
-        // await sendResetEmail(email, resetToken);
+        // ✅ Generate reset token (15 mins validity)
+        const resetToken = generateResetToken(user.id, user.email);
+        const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
+
+        console.log("====================================");
+        console.log("🔑 PASSWORD RESET REQUEST");
+        console.log("User  :", user.name);
+        console.log("Email :", user.email);
+        console.log("Token :", resetToken);
+        console.log("Link  :", resetUrl);
+        console.log("====================================");
 
         res.status(200).json({
             success: true,
-            message: 'Password reset link sent to your email'
+            message: 'Password reset link and token generated successfully.',
+            token: resetToken,
+            resetToken,
+            resetUrl,
+            user: {
+                name: user.name,
+                email: user.email
+            }
         });
 
     } catch (error) {
         console.error('Forgot password error:', error);
-        next(new AppError('Failed to process request', 500));
+        next(new AppError('Failed to process password reset request', 500));
     }
 };
 
@@ -319,34 +345,42 @@ const resetPassword = async (req, res, next) => {
         const { token, newPassword } = req.body;
 
         if (!token || !newPassword) {
-            return next(new AppError('Token and new password are required', 400));
+            return next(new AppError('Reset token and new password are required', 400));
         }
 
         if (newPassword.length < 6) {
-            return next(new AppError('Password must be at least 6 characters', 400));
+            return next(new AppError('Password must be at least 6 characters long', 400));
         }
 
-        // ✅ Verify token (implementation depends on your setup)
-        // const userId = verifyResetToken(token);
-        // if (!userId) {
-        //     return next(new AppError('Invalid or expired token', 400));
-        // }
+        // ✅ Verify token
+        const decoded = verifyResetToken(token);
+        if (!decoded || !decoded.id) {
+            return next(new AppError('Password reset token is invalid or has expired. Please request a new one.', 400));
+        }
+
+        // ✅ Verify user exists
+        const user = await UserModel.findById(decoded.id);
+        if (!user) {
+            return next(new AppError('User account not found', 404));
+        }
 
         // ✅ Hash new password
         const salt = await bcrypt.genSalt(parseInt(process.env.BCRYPT_ROUNDS || 10));
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-        // ✅ Update password (implementation depends on your setup)
-        // await UserModel.updatePassword(userId, hashedPassword);
+        // ✅ Update password in database
+        await UserModel.updatePassword(user.id, hashedPassword);
+
+        console.log(`✅ Password successfully reset for user: ${user.email} (ID: ${user.id})`);
 
         res.status(200).json({
             success: true,
-            message: 'Password reset successfully'
+            message: 'Your password has been reset successfully! You can now log in with your new password.'
         });
 
     } catch (error) {
         console.error('Reset password error:', error);
-        next(new AppError('Failed to reset password', 500));
+        next(new AppError('Failed to reset password. Please try again.', 500));
     }
 };
 
